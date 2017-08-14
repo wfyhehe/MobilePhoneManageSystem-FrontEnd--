@@ -1,12 +1,27 @@
 <template>
   <div class="home">
     <h1>Home</h1>
+    <h3>userId: {{tokenModel.userId}}</h3>
+    <h3>token: {{tokenModel.token}}</h3>
   </div>
 </template>
 
 <script>
+  import {mapGetters} from 'vuex'
 
   export default {
+    data() {
+      return {}
+    },
+    computed: {
+      ...mapGetters([
+        'tokenModel'
+      ])
+    },
+    mounted() {
+      console.log(this.tokenModel)
+    }
+
   }
 </script>
 

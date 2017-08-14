@@ -28,7 +28,8 @@
 
 <script>
   import axios from 'axios'
-  import {backEndUrl} from '@/common/config'
+  import {backEndUrl, SUCCESS} from '@/common/config'
+  import {mapMutations} from 'vuex'
 
   export default {
     name: 'login',
@@ -107,13 +108,14 @@
             vCode: this.loginForm.verificationCode
           }
         }).then(function (response) {
-//          if (response.data.status === 0) {
-          if (response.data.status !== 0) { // 跨域问题不好调试，发布时用上面的
+//          if (response.data.status === SUCCESS) {
+          if (response.data.status !== SUCCESS) { // 跨域问题不好调试，发布时用上面的
             axios.post(loginUrl, {
               username: self.loginForm.username,
               password: self.loginForm.password
             }).then(function (response) {
-              if (response.data.status === 0) {
+              if (response.data.status === SUCCESS) {
+                self.setTokenModel(response.data.data)
                 self.$router.push('/home')
               } else {
                 // 账号或密码错误
@@ -127,8 +129,11 @@
             self.refreshImage()
           }
         })
-      }
-    },
+      },
+      ...mapMutations({
+        setTokenModel: 'SET_TOKEN_MODEL'
+      })
+    }
 
   }
 </script>
