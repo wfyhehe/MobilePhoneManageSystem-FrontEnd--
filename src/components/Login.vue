@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <div class="login-form">
-      <h2>登陆</h2>
+      <h2>登录</h2>
       <el-form :model="loginForm" :rules="loginRule" ref="loginForm"
                :label-position="labelPosition" label-width="100px">
         <el-form-item label="用户名" prop="username">
@@ -15,7 +15,7 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitForm('loginForm')">提交</el-button>
-          <el-button @click="resetForm('loginForm')">重置</el-button>
+          <el-button @click="register">注册</el-button>
           <span class="v-code">
             <img :src="verificationCodeUrl" ref="vCode" @click="refreshImage"/>
             <a href="javascript:void(0);" @click="refreshImage">看不清，换一张</a>
@@ -28,7 +28,8 @@
 
 <script>
   import axios from 'axios'
-  import {backEndUrl, SUCCESS} from '@/common/config'
+  import {backEndUrl, SUCCESS, validateToken} from '@/common/config'
+  import {setToken, setUserInfo} from '@/common/cache'
   import {mapMutations} from 'vuex'
 
   export default {
@@ -102,24 +103,44 @@
       login() {
         let checkVCodeUrl = `${backEndUrl}/util/check_v-code.do`
         let loginUrl = `${backEndUrl}/user/login.do`
+        let userInfoUrl = `${backEndUrl}/user/get_user_info.do`
         let self = this
-        axios.get(checkVCodeUrl, {
+        axios.get(checkVCodeUrl, { // 验证码
           params: {
-            vCode: this.loginForm.verificationCode
+            vCode: self.loginForm.verificationCode
           }
         }).then(function (response) {
 //          if (response.data.status === SUCCESS) {
-          if (response.data.status !== SUCCESS) { // 跨域问题不好调试，发布时用上面的
-            axios.post(loginUrl, {
+          if (response.data.status !== SUCCESS) { // 验证码正确，跨域问题不好调试，发布时用上面的
+            axios.post(loginUrl, { // 验证用户名密码
               username: self.loginForm.username,
               password: self.loginForm.password
-            }).then(function (response) {
+            }, {
+              headers: {
+                'Content-Type': 'application/json;charset=UTF-8'
+              }
+            }).then((response) => {
               if (response.data.status === SUCCESS) {
-                self.setTokenModel(response.data.data)
+                // 用户名密码正确
+                let tokenModel = response.data.data
+                self.setTokenModel(tokenModel)
+                axios.get(userInfoUrl, { // 获取用户信息
+                  params: {
+                    userId: tokenModel.userId,
+                    token: tokenModel.token
+                  }
+                }).then((response) => {
+                  if (response.data.status === SUCCESS) {
+                    // 将用户信息存入local storage
+                    setUserInfo(response.data.data)
+                    self.setUser(response.data.data)
+                  }
+                })
+                setToken(tokenModel)
                 self.$router.push('/home')
               } else {
                 // 账号或密码错误
-                self.$message(response.data.msg)
+                self.$message.error(response.data.msg)
                 self.refreshImage()
               }
             })
@@ -130,8 +151,17 @@
           }
         })
       },
+      register() {
+        this.$router.push('/register')
+      },
       ...mapMutations({
+        setUser: 'SET_USER',
         setTokenModel: 'SET_TOKEN_MODEL'
+      })
+    },
+    mounted() {
+      validateToken(this, () => {
+        this.$router.push('/home')
       })
     }
 
@@ -142,7 +172,7 @@
 <style scoped>
   .login-form {
     width: 500px;
-    margin: 15% auto;
+    margin: 5% auto;
   }
 
   .login-form img {
@@ -161,19 +191,7 @@
 
   h1, h2 {
     font-weight: normal;
+    margin: 40px;
   }
 
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-
-  li {
-    display: inline-block;
-    margin: 0 10px;
-  }
-
-  a {
-    color: #42b983;
-  }
 </style>

@@ -1,28 +1,25 @@
 <template>
   <div class="home">
     <h1>Home</h1>
-    <h3>userId: {{tokenModel.userId}}</h3>
-    <h3>token: {{tokenModel.token}}</h3>
   </div>
 </template>
 
 <script>
-  import {mapGetters} from 'vuex'
+  import {getToken, setToken} from '@/common/cache'
+  import axios from 'axios'
+  import {backEndUrl, SUCCESS, validateToken} from '@/common/config'
 
   export default {
     data() {
-      return {}
+      return {
+      }
     },
-    computed: {
-      ...mapGetters([
-        'tokenModel'
-      ])
-    },
+    methods: {},
     mounted() {
-      console.log(this.tokenModel)
     }
-
   }
+
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
