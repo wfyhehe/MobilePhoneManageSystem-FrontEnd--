@@ -6,7 +6,7 @@
              @close="handleClose"
              :router="true"
              theme="dark">
-      <p class="title">手机进销存管理系统</p>
+      <router-link tag="p" to="/" class="title">手机进销存管理系统</router-link>
       <div class="login-register-logout" v-show="!isLogin">
         <router-link to="/login" tag="span">登录</router-link>
         <span>&nbsp;/&nbsp;</span>
@@ -17,18 +17,16 @@
         <span>&nbsp;/&nbsp;</span>
         <span @click="logout">注销</span>
       </div>
-      <el-submenu index="1">
-        <template slot="title">导航一</template>
-        <el-menu-item index="1-1">选项1</el-menu-item>
-        <el-menu-item index="1-2">选项2</el-menu-item>
-        <el-menu-item index="1-3">选项3</el-menu-item>
-        <el-submenu index="1-4">
-          <template slot="title">选项4</template>
-          <el-menu-item index="1-4-1">选项1</el-menu-item>
-        </el-submenu>
+      <el-submenu :index="menu.path || ''" v-for="(menu, i) in menus" :key="i"
+                  v-loading.body="loading">
+        <template slot="title">{{menu.name}}</template>
+        <el-menu-item :index="submenu.path || ''"
+                      v-for="(submenu, subi) in menu.children"
+                      :key="subi"
+                      v-if="menu.type === 'PARENT'">
+          {{submenu.name}}
+        </el-menu-item>
       </el-submenu>
-      <el-menu-item index="2">导航二</el-menu-item>
-      <el-menu-item index="3">导航三</el-menu-item>
     </el-menu>
   </div>
 </template>
@@ -42,8 +40,8 @@
   export default {
     data() {
       return {
-        activeIndex: '1',
-        activeIndex2: '1'
+        menus: [],
+        loading: true
       };
     },
     computed: {
@@ -95,8 +93,23 @@
       })
     },
     mounted() {
+      this.loading = true
       this.setUser(getUserInfo())
       this.setTokenModel(getToken())
+      let menuUrl = `${backEndUrl}/menu/get_menus.do`
+      let self = this
+      let roles = []
+      if (this.user) {
+        roles = this.user.roles
+      }
+      axios.get(menuUrl, {
+        params: {}
+      }).then((response) => {
+        if (response.data.status === SUCCESS) {
+          self.menus = response.data.data
+          self.loading = false
+        }
+      })
     }
   }
 </script>
@@ -114,6 +127,7 @@
 
   .title {
     margin: 30px 10px;
+    cursor: pointer;
     float: top;
     color: #F9FAFC;
     font-size: large;

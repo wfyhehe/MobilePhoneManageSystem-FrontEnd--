@@ -1,0 +1,189 @@
+<template>
+  <div>
+    <div class="role-manage">
+      <h2>角色管理</h2>
+      <el-table
+        :data="menus"
+        style="width: 100%"
+        @header-click="addRole"
+        align="left"
+        v-loading.body="loading">
+        <el-table-column
+          class="column"
+          prop="name"
+          label="角色名称　＋添加角色">
+        </el-table-column>
+        <el-table-column
+          prop="path"
+          label="菜单路径">
+        </el-table-column>
+        <el-table-column
+          prop="remark"
+          label="说明">
+        </el-table-column>
+        <el-table-column label="操作">
+          <template scope="scope">
+            <el-button type="text" size="small"
+                       @click="up(scope.row)"><i class="el-icon-arrow-up"></i></el-button>
+            <el-button type="text" size="small"
+                       @click="down(scope.row)"><i class="el-icon-arrow-down"></i></el-button>
+            <el-button :plain="true" type="info" icon="edit" size="small"
+                       @click="editMenu(scope.row)"></el-button>
+            <el-button :plain="true" type="danger" icon="delete" size="small"
+                       @click="deleteMenu(scope.row)"></el-button>
+            <el-button :plain="true" type="success" size="small"
+                       v-if="!isLeaf(scope.$index)"
+                       @click="addChild(scope.row)"><i class="el-icon-plus"></i>
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+    <router-view></router-view>
+  </div>
+</template>
+
+<script>
+  import axios from 'axios'
+  import {backEndUrl, SUCCESS} from '@/common/config'
+
+  export default {
+    data() {
+      return {
+        rawMenus: [],
+        toggleDetail: false,
+        loading: true
+      }
+    },
+    watch: {
+      // 如果路由有变化，会再次执行该方法
+      '$route': 'getRoles'
+    },
+    methods: {
+      getRoles() {
+        this.loading = true
+        let self = this
+        let menuUrl = `${backEndUrl}/menu/get_menus.do`
+        axios.get(menuUrl, {
+          params: {}
+        }).then((response) => {
+          if (response.data.status === SUCCESS) {
+            let menus = response.data.data
+//            menus.sort((a, b) => {
+//              return parseInt(a.sortOrder) - parseInt(b.sortOrder)
+//            })
+//            for (let menu of menus) {
+//              if (menu.children.length > 0) {
+//                menu.children.sort((a, b) => {
+//                  return parseInt(a.sortOrder) - parseInt(b.sortOrder)
+//                })
+//              }
+//            }
+            self.rawMenus = menus
+            self.loading = false
+          }
+        })
+      },
+      addRole(column) {
+        if (column.label === '角色名称　＋添加角色') {
+          let self = this
+          let addRoleUrl = `${backEndUrl}/menu/add_role.do`
+          axios.get(addRoleUrl, {
+            params: {
+              name: '新建角色'
+            }
+          }).then((response) => {
+            if (response.data.status === SUCCESS) {
+              this.getRoles()
+            }
+          })
+        }
+      },
+      isLeaf(index) {
+        return this.menus[index].type === 'NODE'
+      },
+      up(row) {
+        let upUrl = `${backEndUrl}/menu/up.do`
+        axios.get(upUrl, {
+          params: {
+            id: row.id
+          }
+        }).then(response => {
+          if (response.data.status === SUCCESS) {
+            this.getMenus()
+          }
+        })
+      },
+      down(row) {
+        let downUrl = `${backEndUrl}/menu/down.do`
+        axios.get(downUrl, {
+          params: {
+            id: row.id
+          }
+        }).then(response => {
+          if (response.data.status === SUCCESS) {
+            this.getMenus()
+          }
+        })
+      },
+      addChild(row) {
+        let self = this
+        let addMenuUrl = `${backEndUrl}/menu/add_menu.do`
+        let sortOrder = 1
+        for (let child of row.children) {
+          if (child.sortOrder >= sortOrder) {
+            sortOrder = child.sortOrder + 1
+          }
+        }
+        axios.get(addMenuUrl, {
+          params: {
+            parentId: row.id,
+            sortOrder
+          }
+        }).then((response) => {
+          if (response.data.status === SUCCESS) {
+            this.getMenus()
+          }
+        })
+      },
+      deleteMenu(row) {
+        let self = this
+        let deleteUrl = `${backEndUrl}/menu/delete_menu.do`
+        this.$confirm('此操作将永久删除该菜单及其所有子菜单, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'danger'
+        }).then(() => {
+          axios.get(deleteUrl, {
+            params: {
+              id: row.id
+            }
+          }).then((response) => {
+            if (response.data.status === SUCCESS) {
+              self.getMenus()
+            }
+          })
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+        }).catch(() => {
+          return
+        })
+      },
+      editMenu(row) {
+        this.$router.push(`/menu_manage/${row.id}`)
+        this.toggleDetail = true
+      }
+    },
+    mounted() {
+      this.getMenus()
+    }
+  }
+</script>
+
+<style>
+  th .cell {
+    cursor: pointer;
+  }
+</style>
