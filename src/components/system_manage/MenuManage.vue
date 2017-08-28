@@ -58,7 +58,6 @@
     data() {
       return {
         rawMenus: [],
-        toggleDetail: false,
         loading: true
       }
     },
@@ -96,18 +95,7 @@
           params: {}
         }).then((response) => {
           if (response.data.status === SUCCESS) {
-            let menus = response.data.data
-//            menus.sort((a, b) => {
-//              return parseInt(a.sortOrder) - parseInt(b.sortOrder)
-//            })
-//            for (let menu of menus) {
-//              if (menu.children.length > 0) {
-//                menu.children.sort((a, b) => {
-//                  return parseInt(a.sortOrder) - parseInt(b.sortOrder)
-//                })
-//              }
-//            }
-            self.rawMenus = menus
+            self.rawMenus = response.data.data
             self.loading = false
           }
         })
@@ -122,10 +110,9 @@
               sortOrder = topMenu.sortOrder + 1
             }
           }
-          axios.get(addMenuUrl, {
-            params: {
-              sortOrder
-            }
+          axios.post(addMenuUrl, {
+            name: '新建菜单项',
+            sortOrder
           }).then((response) => {
             if (response.data.status === SUCCESS) {
               this.getMenus()
@@ -169,11 +156,10 @@
             sortOrder = child.sortOrder + 1
           }
         }
-        axios.get(addMenuUrl, {
-          params: {
-            parentId: row.id,
-            sortOrder
-          }
+        axios.post(addMenuUrl, {
+          parentId: row.id,
+          name: '新建菜单项',
+          sortOrder
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             this.getMenus()

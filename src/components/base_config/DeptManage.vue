@@ -1,43 +1,51 @@
 <template>
   <div>
-    <div class="role-manage">
-      <h2>角色管理</h2>
+    <div class="dept-manage">
+      <h2>部门管理</h2>
       <el-table
-        :data="roles"
+        :data="depts"
         style="width: 100%"
-        @header-click="addRole"
+        @header-click="addDept"
         align="left"
         v-loading.body="loading">
         <el-table-column
           class="column"
           prop="name"
-          label="角色名称　＋添加角色">
+          label="部门名称　＋添加部门">
+        </el-table-column>
+        <el-table-column
+          prop="address"
+          label="地址">
+        </el-table-column>
+        <el-table-column
+          prop="tel"
+          label="电话">
+        </el-table-column>
+        <el-table-column
+          prop="contact"
+          label="联系人">
         </el-table-column>
         <el-table-column
           prop="remark"
-          label="角色说明">
-        </el-table-column>
-        <el-table-column
-          prop="status"
-          label="角色状态">
+          label="备注">
         </el-table-column>
         <el-table-column label="操作">
           <template scope="scope">
             <el-button :plain="true" type="info" icon="edit" size="small"
-                       @click="editRole(scope.row)"></el-button>
+                       @click="editDept(scope.row)"></el-button>
             <el-button :plain="true" type="danger" icon="delete" size="small"
-                       @click="deleteRole(scope.row)"></el-button>
+                       @click="deleteDept(scope.row)"></el-button>
           </template>
         </el-table-column>
       </el-table>
       <div class="recover">
-        <el-button @click="getDeletedRoles" :plain="true" v-show="!showDeleted" type="info">显示已删除角色</el-button>
-        <el-button @click="hideRecover" :plain="true" v-show="showDeleted" type="info">隐藏已删除角色</el-button>
+        <el-button @click="getDeletedDepts" :plain="true" v-show="!showDeleted" type="info">显示已删除部门</el-button>
+        <el-button @click="hideRecover" :plain="true" v-show="showDeleted" type="info">隐藏已删除部门</el-button>
       </div>
       <el-table
         v-if="showDeleted"
         class="form2"
-        :data="deletedRoles"
+        :data="deletedDepts"
         row-class-name="deleted-row"
         style="width: 100%"
         align="left"
@@ -45,21 +53,29 @@
         <el-table-column
           class="column"
           prop="name"
-          label="角色名称">
+          label="部门名称">
+        </el-table-column>
+        <el-table-column
+          prop="address"
+          label="地址">
+        </el-table-column>
+        <el-table-column
+          prop="tel"
+          label="电话">
+        </el-table-column>
+        <el-table-column
+          prop="contact"
+          label="联系人">
         </el-table-column>
         <el-table-column
           prop="remark"
-          label="角色说明">
-        </el-table-column>
-        <el-table-column
-          prop="status"
-          label="角色状态">
+          label="备注">
         </el-table-column>
         <el-table-column label="操作">
           <template scope="scope">
             <el-button
               size="small"
-              @click="recoverRole(scope.row)">恢复</el-button>
+              @click="recoverDept(scope.row)">恢复</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -75,8 +91,8 @@
   export default {
     data() {
       return {
-        roles: [],
-        deletedRoles: [],
+        depts: [],
+        deletedDepts: [],
         loading: true,
         loadingDeleted: true,
         showDeleted: false
@@ -84,43 +100,44 @@
     },
     watch: {
       // 如果路由有变化，会再次执行该方法
-      '$route': 'getRoles'
+      '$route': 'getDepts'
     },
     methods: {
-      getRoles() {
+      getDepts() {
         this.loading = true
         let self = this
-        let roleUrl = `${backEndUrl}/role/get_roles.do`
-        axios.get(roleUrl, {
+        let deptUrl = `${backEndUrl}/dept/get_depts.do`
+        axios.get(deptUrl, {
           params: {}
         }).then((response) => {
           if (response.data.status === SUCCESS) {
-            self.roles = response.data.data
+            self.depts = response.data.data
             self.loading = false
           }
         })
       },
-      addRole(column) {
-        if (column.label === '角色名称　＋添加角色') {
+      addDept(column) {
+        if (column.label === '部门名称　＋添加部门') {
           let self = this
-          let addRoleUrl = `${backEndUrl}/role/add_role.do`
-          axios.post(addRoleUrl, {
-            name: '新建角色'
+          let addDeptUrl = `${backEndUrl}/dept/add_dept.do`
+          axios.post(addDeptUrl, {
+            name: '新建部门',
+            address: '比基尼海滩裤头村菠萝屋'
           }, {
             headers: {
               'Content-Type': 'application/json; charset=UTF-8'
             }
           }).then((response) => {
             if (response.data.status === SUCCESS) {
-              this.getRoles()
+              this.getDepts()
             }
           })
         }
       },
-      deleteRole(row) {
+      deleteDept(row) {
         let self = this
-        let deleteUrl = `${backEndUrl}/role/delete_role.do`
-        this.$confirm('此操作将删除角色, 是否继续？（可操作数据库进行恢复）', '提示', {
+        let deleteUrl = `${backEndUrl}/dept/delete_dept.do`
+        this.$confirm('此操作将删除部门, 是否继续？（可操作数据库进行恢复）', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'danger'
@@ -131,7 +148,7 @@
             }
           }).then((response) => {
             if (response.data.status === SUCCESS) {
-              self.getRoles()
+              self.getDepts()
             }
           })
           this.$message({
@@ -142,34 +159,34 @@
           return
         })
       },
-      editRole(row) {
-        this.$router.push(`/role_manage/${row.id}`)
+      editDept(row) {
+        this.$router.push(`/dept_manage/${row.id}`)
       },
-      recoverRole(row) {
+      recoverDept(row) {
         let self = this
-        let recoverRoleUrl = `${backEndUrl}/role/recover_role.do`
-        axios.get(recoverRoleUrl, {
+        let recoverDeptUrl = `${backEndUrl}/dept/recover_dept.do`
+        axios.get(recoverDeptUrl, {
           params:{
             id: row.id
           }
         }).then((response) => {
           if (response.data.status === SUCCESS) {
-            self.getRoles()
-            self.getDeletedRoles()
+            self.getDepts()
+            self.getDeletedDepts()
             self.$message.success('恢复成功')
           }
         })
       },
-      getDeletedRoles() {
+      getDeletedDepts() {
         this.showDeleted = true
         this.loadingDeleted = true
         let self = this
-        let deletedRoleUrl = `${backEndUrl}/role/get_deleted_roles.do`
-        axios.get(deletedRoleUrl, {
+        let deletedDeptUrl = `${backEndUrl}/dept/get_deleted_depts.do`
+        axios.get(deletedDeptUrl, {
           params: {}
         }).then((response) => {
           if (response.data.status === SUCCESS) {
-            self.deletedRoles = response.data.data
+            self.deletedDepts = response.data.data
             self.loadingDeleted = false
           }
         })
@@ -180,7 +197,7 @@
       }
     },
     mounted() {
-      this.getRoles()
+      this.getDepts()
     }
   }
 </script>
@@ -190,7 +207,7 @@
     cursor: pointer;
   }
 
-  .role-manage {
+  .dept-manage {
   }
 
   .form2 {

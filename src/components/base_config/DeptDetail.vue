@@ -1,15 +1,21 @@
 <template>
-  <div class="role-detail">
+  <div class="dept-detail">
     <el-form ref="form" :model="form" class="form" label-width="80px">
-      <h3>修改角色项</h3>
-      <el-form-item label="角色名称">
+      <h3>修改部门项</h3>
+      <el-form-item label="部门名称">
         <el-input v-model="form.name"></el-input>
       </el-form-item>
-      <el-form-item label="角色说明">
-        <el-input type="textarea" v-model="form.remark"></el-input>
+      <el-form-item label="地址">
+        <el-input v-model="form.address"></el-input>
       </el-form-item>
-      <el-form-item label="启用">
-        <el-switch on-text="" off-text="" v-model="form.online"></el-switch>
+      <el-form-item label="电话">
+        <el-input v-model="form.tel"></el-input>
+      </el-form-item>
+      <el-form-item label="联系人">
+        <el-input v-model="form.contact"></el-input>
+      </el-form-item>
+      <el-form-item label="备注">
+        <el-input type="textarea" v-model="form.remark"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">确定</el-button>
@@ -28,21 +34,25 @@
       return {
         form: {
           name: '',
-          remark: '',
-          online: true
+          address: '',
+          tel: '',
+          contact: '',
+          remark: ''
         },
-        role: {}
+        dept: {}
       }
     },
     methods: {
       onSubmit() {
         let self = this
-        let updateRoleUrl = `${backEndUrl}/role/update_role.do`
-        axios.post(updateRoleUrl, JSON.stringify({
+        let updateDeptUrl = `${backEndUrl}/dept/update_dept.do`
+        axios.post(updateDeptUrl, JSON.stringify({
           id: self.$route.params.id,
           name: self.form.name,
-          remark: self.form.remark,
-          status: self.form.online ? 'ONLINE' : 'OFFLINE'
+          address: self.form.address,
+          tel: self.form.tel,
+          contact: self.form.contact,
+          remark: self.form.remark
         }), {
           headers: {
             'Content-Type': 'application/json;charset=UTF-8'
@@ -62,18 +72,20 @@
     },
     mounted() {
       let self = this
-      let getRoleUrl = `${backEndUrl}/role/get_role.do`
-      axios.get(getRoleUrl, {
+      let getDeptUrl = `${backEndUrl}/dept/get_dept.do`
+      axios.get(getDeptUrl, {
         params: {
           id: self.$route.params.id
         }
       }).then(response => {
         if (response.data.status === SUCCESS) {
-          let role = response.data.data
-          self.role = role
-          self.form.name = role.name
-          self.form.remark = role.remark
-          self.form.online = role.status === 'ONLINE'
+          let dept = response.data.data
+          self.dept = dept
+          self.form.name = dept.name
+          self.form.address = dept.address
+          self.form.tel = dept.tel
+          self.form.contact = dept.contact
+          self.form.remark = dept.remark
         }
       })
     }
@@ -81,7 +93,7 @@
 </script>
 
 <style>
-  .role-detail {
+  .dept-detail {
     width: 100%;
     height: 100%;
     margin: 0;

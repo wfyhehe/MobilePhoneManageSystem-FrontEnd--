@@ -1,71 +1,78 @@
 <template>
   <div>
-    <div class="user-manage">
-      <h2>用户管理</h2>
+    <div class="employee-manage">
+      <h2>员工管理</h2>
       <div class="search">
         <el-form :inline="true" :model="searchForm">
-          <el-form-item label="用户名">
-            <el-input v-model="searchForm.username" placeholder="用户名"></el-input>
-          </el-form-item>
           <el-form-item label="员工姓名">
             <el-input v-model="searchForm.name" placeholder="员工姓名"></el-input>
+          </el-form-item>
+          <el-form-item label="部门">
+            <el-select v-model="searchForm.dept"
+                       placeholder="部门"
+                       @visible-change="selectShowed">
+              <el-option label="所有部门" value=""></el-option>
+              <el-option v-for="(dept, i) in depts" :key="i" :label="dept.name" :value="dept.name"></el-option>
+            </el-select>
+            <!--<el-input v-model="searchForm.dept" placeholder="部门"></el-input>-->
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="search">查询</el-button>
           </el-form-item>
         </el-form>
       </div>
       <el-table
-        :data="users"
+        :data="employees"
         style="width: 100%"
-        @header-click="addUser"
+        @header-click="addEmployee"
         align="left"
         :default-sort="{prop: 'dept.name', order: 'descending'}"
         v-loading.body="loading">
         <el-table-column
           class="column"
-          prop="username"
+          prop="name"
           sortable
-          label="用户名">
+          label="员工名称　＋添加员工">
         </el-table-column>
         <el-table-column
-          prop="name"
-          label="员工姓名">
+          prop="tel"
+          label="电话">
+        </el-table-column>
+        <el-table-column
+          prop="type"
+          sortable
+          label="类别">
+        </el-table-column>
+        <el-table-column
+          prop="dept.name"
+          sortable
+          label="部门">
         </el-table-column>
         <el-table-column
           prop="remark"
           label="备注">
         </el-table-column>
         <el-table-column
-          prop="createTime"
-          sortable
-          label="创建时间">
-        </el-table-column>
-        <el-table-column
-          prop="lastLoginTime"
-          sortable
-          label="上次登录时间">
-        </el-table-column>
-        <el-table-column
-          label="角色">
-          <template scope="scope">
-            <span v-for="role in scope.row.roles">{{role.name}},&nbsp;</span>
-          </template>
+          prop="user.username"
+          label="账号">
         </el-table-column>
         <el-table-column label="操作">
           <template scope="scope">
             <el-button :plain="true" type="info" icon="edit" size="small"
-                       @click="editUser(scope.row)"></el-button>
+                       @click="editEmployee(scope.row)"></el-button>
             <el-button :plain="true" type="danger" icon="delete" size="small"
-                       @click="deleteUser(scope.row)"></el-button>
+                       @click="deleteEmployee(scope.row)"></el-button>
           </template>
         </el-table-column>
       </el-table>
       <div class="recover">
-        <el-button @click="getDeletedUsers" :plain="true" v-show="!showDeleted" type="info">显示已删除用户</el-button>
-        <el-button @click="hideRecover" :plain="true" v-show="showDeleted" type="info">隐藏已删除用户</el-button>
+        <el-button @click="getDeletedEmployees" :plain="true" v-show="!showDeleted" type="info">显示已删除员工</el-button>
+        <el-button @click="hideRecover" :plain="true" v-show="showDeleted" type="info">隐藏已删除员工</el-button>
       </div>
       <el-table
         v-if="showDeleted"
         class="form2"
-        :data="deletedUsers"
+        :data="deletedEmployees"
         row-class-name="deleted-row"
         style="width: 100%"
         align="left"
@@ -74,7 +81,7 @@
         <el-table-column
           class="column"
           prop="name"
-          label="用户名称"
+          label="员工名称"
           sortable>
         </el-table-column>
         <el-table-column
@@ -103,7 +110,7 @@
           <template scope="scope">
             <el-button
               size="small"
-              @click="recoverUser(scope.row)">恢复
+              @click="recoverEmployee(scope.row)">恢复
             </el-button>
           </template>
         </el-table-column>
@@ -123,10 +130,10 @@
       return {
         searchForm: {
           name: '',
-          username: ''
+          dept: ''
         },
-        users: [],
-        deletedUsers: [],
+        employees: [],
+        deletedEmployees: [],
         depts: [],
         loading: true,
         loadingDeleted: true,
@@ -140,7 +147,7 @@
     },
     watch: {
       // 如果路由有变化，会再次执行该方法
-      '$route': 'getUsers',
+      '$route': 'getEmployees',
       searchFormJson: debounce(function () {
         this.search()
       }, 500)
@@ -149,7 +156,7 @@
       search() {
         this.loading = true
         let self = this
-        let searchUrl = `${backEndUrl}/user/get_users.do`
+        let searchUrl = `${backEndUrl}/employee/get_employees.do`
         axios.post(searchUrl, JSON.stringify({
           name: this.searchForm.name,
           dept: this.searchForm.dept
@@ -159,43 +166,43 @@
           }
         }).then((response) => {
           if (response.data.status === SUCCESS) {
-            self.users = response.data.data
+            self.employees = response.data.data
             self.loading = false
           }
         })
       },
-      getUsers() {
+      getEmployees() {
         this.loading = true
         let self = this
-        let userUrl = `${backEndUrl}/user/get_users.do`
-        axios.post(userUrl, {}).then((response) => {
+        let employeeUrl = `${backEndUrl}/employee/get_employees.do`
+        axios.post(employeeUrl, {}).then((response) => {
           if (response.data.status === SUCCESS) {
-            self.users = response.data.data
+            self.employees = response.data.data
             self.loading = false
           }
         })
       },
-      addUser(column) {
-        if (column.label === '用户名称　＋添加用户') {
+      addEmployee(column) {
+        if (column.label === '员工名称　＋添加员工') {
           let self = this
-          let addUserUrl = `${backEndUrl}/user/add_user.do`
-          axios.post(addUserUrl, {
-            name: '新建用户'
+          let addEmployeeUrl = `${backEndUrl}/employee/add_employee.do`
+          axios.post(addEmployeeUrl, {
+            name: '新建员工'
           }, {
             headers: {
               'Content-Type': 'application/json; charset=UTF-8'
             }
           }).then((response) => {
             if (response.data.status === SUCCESS) {
-              this.getUsers()
+              this.getEmployees()
             }
           })
         }
       },
-      deleteUser(row) {
+      deleteEmployee(row) {
         let self = this
-        let deleteUrl = `${backEndUrl}/user/delete_user.do`
-        this.$confirm('此操作将删除用户, 是否继续？（可操作数据库进行恢复）', '提示', {
+        let deleteUrl = `${backEndUrl}/employee/delete_employee.do`
+        this.$confirm('此操作将删除员工, 是否继续？（可操作数据库进行恢复）', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'danger'
@@ -206,7 +213,7 @@
             }
           }).then((response) => {
             if (response.data.status === SUCCESS) {
-              self.getUsers()
+              self.getEmployees()
             }
           })
           this.$message({
@@ -217,34 +224,34 @@
           return
         })
       },
-      editUser(row) {
-        this.$router.push(`/user_manage/${row.id}`)
+      editEmployee(row) {
+        this.$router.push(`/employee_manage/${row.id}`)
       },
-      recoverUser(row) {
+      recoverEmployee(row) {
         let self = this
-        let recoverUserUrl = `${backEndUrl}/user/recover_user.do`
-        axios.get(recoverUserUrl, {
+        let recoverEmployeeUrl = `${backEndUrl}/employee/recover_employee.do`
+        axios.get(recoverEmployeeUrl, {
           params: {
             id: row.id
           }
         }).then((response) => {
           if (response.data.status === SUCCESS) {
-            self.getUsers()
-            self.getDeletedUsers()
+            self.getEmployees()
+            self.getDeletedEmployees()
             self.$message.success('恢复成功')
           }
         })
       },
-      getDeletedUsers() {
+      getDeletedEmployees() {
         this.showDeleted = true
         this.loadingDeleted = true
         let self = this
-        let deletedUserUrl = `${backEndUrl}/user/get_deleted_users.do`
-        axios.get(deletedUserUrl, {
+        let deletedEmployeeUrl = `${backEndUrl}/employee/get_deleted_employees.do`
+        axios.get(deletedEmployeeUrl, {
           params: {}
         }).then((response) => {
           if (response.data.status === SUCCESS) {
-            self.deletedUsers = response.data.data
+            self.deletedEmployees = response.data.data
             self.loadingDeleted = false
           }
         })
@@ -272,7 +279,7 @@
     },
     mounted() {
       console.log(this)
-      this.getUsers()
+      this.getEmployees()
     }
   }
 </script>
@@ -282,7 +289,7 @@
   /*cursor: pointer;*/
   /*}*/
 
-  .user-manage {
+  .employee-manage {
   }
 
   .form2 {

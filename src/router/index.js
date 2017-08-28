@@ -61,6 +61,30 @@ const RoleDetail = (resolve) => {
   })
 }
 
+const DeptManage = (resolve) => {
+  import('@/components/base_config/DeptManage').then((module) => {
+    resolve(module)
+  })
+}
+
+const DeptDetail = (resolve) => {
+  import('@/components/base_config/DeptDetail').then((module) => {
+    resolve(module)
+  })
+}
+
+const EmployeeManage = (resolve) => {
+  import('@/components/base_config/EmployeeManage').then((module) => {
+    resolve(module)
+  })
+}
+
+const EmployeeDetail = (resolve) => {
+  import('@/components/base_config/EmployeeDetail').then((module) => {
+    resolve(module)
+  })
+}
+
 Vue.use(Router);
 
 export default new Router({
@@ -98,6 +122,20 @@ export default new Router({
     children: [{
       path: ':id',
       component: RoleDetail
+    }]
+  }, {
+    path: '/dept_manage',
+    component: DeptManage,
+    children: [{
+      path: ':id',
+      component: DeptDetail
+    }]
+  }, {
+    path: '/employee_manage',
+    component: EmployeeManage,
+    children: [{
+      path: ':id',
+      component: EmployeeDetail
     }]
   }]
 })

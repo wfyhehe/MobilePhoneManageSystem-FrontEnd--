@@ -17,7 +17,7 @@
         <span>&nbsp;/&nbsp;</span>
         <span @click="logout">注销</span>
       </div>
-      <el-submenu :index="menu.path || ''" v-for="(menu, i) in menus" :key="i"
+      <el-submenu :index="menu.name || ''" v-for="(menu, i) in menus" :key="i"
                   v-loading.body="loading">
         <template slot="title">{{menu.name}}</template>
         <el-menu-item :index="submenu.path || ''"
@@ -84,6 +84,7 @@
             deleteUserInfo()
             self.setUser(null)
             self.$router.push('/login')
+            self.setUser({})
           }
         })
       },
@@ -94,10 +95,15 @@
     },
     mounted() {
       this.loading = true
-      this.setUser(getUserInfo())
-      this.setTokenModel(getToken())
       let menuUrl = `${backEndUrl}/menu/get_menus.do`
       let self = this
+      this.setUser(getUserInfo())
+      this.setTokenModel(getToken())
+      validateToken(this, () => {
+        },
+        () => {
+          self.setUser({})
+        })
       let roles = []
       if (this.user) {
         roles = this.user.roles

@@ -10,10 +10,12 @@ export const SUCCESS = 0
  * @param success: a function which will execute when response.status === SUCCESS
  * @returns an object tokenModel:{ userId, token }
  */
-export function validateToken(self, success) {
+export function validateToken(self, success, fail) {
   let tokenModel = getToken()
   if(!tokenModel) {
-    self.$router.push('/login')
+    if(fail) {
+      fail()
+    }
     return null
   }
   let validateTokenUrl = `${backEndUrl}/user/validate_token.do`
@@ -24,7 +26,9 @@ export function validateToken(self, success) {
     }
   }).then((response) => {
     if (response && response.data.status !== SUCCESS) {
-      self.$router.push('/login')
+      if(fail) {
+        fail()
+      }
       self.$message.warning(response.data.msg)
     } else {
       if (success) {
@@ -32,7 +36,9 @@ export function validateToken(self, success) {
       }
     }
   }).catch(function (err) {
-    self.$router.push('/login')
+    if(fail) {
+      fail()
+    }
     console.log(err)
   })
   return tokenModel
