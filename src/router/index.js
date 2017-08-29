@@ -31,6 +31,12 @@ const UserManage = (resolve) => {
   })
 }
 
+const UserDetail = (resolve) => {
+  import('@/components/system_manage/UserDetail').then((module) => {
+    resolve(module)
+  })
+}
+
 const AuthManage = (resolve) => {
   import('@/components/system_manage/AuthManage').then((module) => {
     resolve(module)
@@ -105,7 +111,11 @@ export default new Router({
     component: Page404
   }, {
     path: '/user_manage',
-    component: UserManage
+    component: UserManage,
+    children: [{
+      path: ':id',
+      component: UserDetail
+    }]
   }, {
     path: '/auth_manage',
     component: AuthManage

@@ -1,32 +1,27 @@
 <template>
   <div class="user-detail">
     <el-form ref="form" :model="form" class="form" label-width="80px">
-      <h3>修改员工项</h3>
+      <h3>修改用户项</h3>
+      <el-form-item label="用户名">
+        <el-input v-model="form.username" :disabled="true"></el-input>
+      </el-form-item>
       <el-form-item label="员工姓名">
-        <el-input v-model="form.name"></el-input>
-      </el-form-item>
-      <el-form-item label="电话">
-        <el-input v-model="form.tel"></el-input>
-      </el-form-item>
-      <el-form-item label="类别">
-        <el-switch
-          v-model="form.type"
-          :width="80"
-          on-text="销售员"
-          off-text="其他">
-        </el-switch>
-      </el-form-item>
-      <el-form-item label="部门">
-        <el-select v-model="form.dept" placeholder="请选择部门" @visible-change="selectShowed">
-          <el-option label="未定" value=""></el-option>
-          <el-option v-for="(item, i) in depts" :key="i" :label="item.name" :value="item.name"></el-option>
-        </el-select>
+        <el-input v-model="form.empName" :disabled="true"></el-input>
+        <el-button class="relate-emp" v-if="!form.employee"
+        @click="relateEmp">关联员工账号</el-button>
       </el-form-item>
       <el-form-item label="备注">
         <el-input type="textarea" v-model="form.remark"></el-input>
       </el-form-item>
-      <el-form-item label="系统账号">
-        <el-input v-model="form.user" :disabled="true"></el-input>
+      <el-form-item label="角色">
+        <el-checkbox-group v-model="form.roleNames">
+          <el-checkbox v-for="role in allRoles"
+                       :key="role.id"
+                       :label="role.name"
+                       :disabled="isSuperAdmin(role)">
+            {{role.name}}
+          </el-checkbox>
+        </el-checkbox-group>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">确定</el-button>
@@ -39,36 +34,44 @@
 <script>
   import axios from 'axios'
   import {backEndUrl, SUCCESS} from '@/common/config'
-  import ElFormItem from "../../../node_modules/element-ui/packages/form/src/form-item.vue";
+  import ElFormItem from '../../../node_modules/element-ui/packages/form/src/form-item.vue';
+  import {mapMutations} from 'vuex'
 
   export default {
     components: {ElFormItem},
     data() {
       return {
         form: {
-          name: '',
-          tel: '',
-          type: true,
-          dept: '',
+          username: '',
+          empName: '',
           remark: '',
-          user: ''
+          roleNames: []
         },
-        user: {},
-        depts: []
+        allRoles: [],
+        user: {}
       }
     },
     methods: {
+      formatData(data) {
+        let dataCopy = JSON.parse(JSON.stringify(data))
+        let newData = {}
+        newData.username = dataCopy.username
+        newData.empName = dataCopy.employee ? dataCopy.employee.name : ''
+        newData.remark = dataCopy.remark
+        let names = []
+        for (let role of dataCopy.roles) {
+          names.push(role.name)
+        }
+        newData.roleNames = names
+        return newData
+      },
       onSubmit() {
         let self = this
         let updateUserUrl = `${backEndUrl}/user/update_user.do`
         axios.post(updateUserUrl, JSON.stringify({
           id: self.$route.params.id,
-          name: self.form.name,
-          tel: self.form.tel,
-          type: self.form.type ? 'SALES' : 'OTHER',
-          dept: self.form.dept,
           remark: self.form.remark,
-          user: self.form.user
+          roleNames: self.form.roleNames
         }), {
           headers: {
             'Content-Type': 'application/json;charset=UTF-8'
@@ -85,42 +88,34 @@
       onCancel() {
         this.$router.back()
       },
-      getDepts() {
-        this.loading = true
-        let self = this
-        let deptUrl = `${backEndUrl}/dept/get_depts.do`
-        axios.get(deptUrl, {
-          params: {}
-        }).then((response) => {
-          if (response.data.status === SUCCESS) {
-            self.depts = response.data.data
-            self.loading = false
-          }
-        })
+      isSuperAdmin(role) {
+        return role.name === '超级管理员'
       },
-      selectShowed(flag) {
-        if (flag && this.depts.length === 0) {
-          this.getDepts()
-        }
-      }
+      relateEmp() {
+        this.setUsername(this.user.username)
+        this.$router.push('/employee_manage')
+      },
+      ...mapMutations({
+        setUsername: 'SET_USERNAME'
+      })
     },
     mounted() {
       let self = this
       let getUserUrl = `${backEndUrl}/user/get_user.do`
+      let getRolesUrl = `${backEndUrl}/role/get_roles.do`
       axios.get(getUserUrl, {
         params: {
           id: self.$route.params.id
         }
       }).then(response => {
         if (response.data.status === SUCCESS) {
-          let user = response.data.data
-          self.user = user
-          self.form.name = user.name
-          self.form.tel = user.tel
-          self.form.type = user.type === 'SALES'
-          self.form.dept = user.dept ? user.dept.name : ''
-          self.form.remark = user.remark
-          self.form.user = user.user ? user.user.name : ''
+          self.user = response.data.data
+          self.form = self.formatData(self.user)
+        }
+      })
+      axios.get(getRolesUrl, {}).then(response => {
+        if (response.data.status === SUCCESS) {
+          self.allRoles = response.data.data
         }
       })
     }
@@ -134,7 +129,7 @@
     margin: 0;
     padding: 0;
     top: 0;
-    z-index: 1;
+    z-index: 2;
     background-color: aliceblue;
     position: fixed;
   }
@@ -147,5 +142,10 @@
   h1, h2, h3 {
     font-weight: normal;
     margin: 40px;
+  }
+
+  .relate-emp {
+    margin: 10px 0 0 0;
+    float: left;
   }
 </style>

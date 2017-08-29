@@ -55,6 +55,19 @@
         <el-table-column
           prop="user.username"
           label="账号">
+          <template scope="scope">
+            {{scope.row.user ? scope.row.user.username : '[无]'}}
+            <el-button
+              size="small"
+              v-if="!scope.row.user"
+              @click="relateUser(scope.row)">关联账号
+            </el-button>
+            <el-button
+              size="small"
+              v-if="scope.row.user"
+              @click="unrelateUser(scope.row)">解除关联
+            </el-button>
+          </template>
         </el-table-column>
         <el-table-column label="操作">
           <template scope="scope">
@@ -116,6 +129,20 @@
         </el-table-column>
       </el-table>
     </div>
+    <el-dialog title="收货地址" :visible.sync="relateFormVisible">
+      <el-form :model="relateForm" :rules="loginRule" label-width="100px">
+        <el-form-item label="用户名" prop="username">
+          <el-input type="text" v-model="relateForm.username"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input type="password" v-model="relateForm.password" auto-complete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="relateFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="relateSubmit">确 定</el-button>
+      </div>
+    </el-dialog>
     <router-view></router-view>
   </div>
 </template>
@@ -124,26 +151,62 @@
   import axios from 'axios'
   import {backEndUrl, SUCCESS} from '@/common/config'
   import {debounce} from '@/common/util'
+  import {mapGetters} from 'vuex'
 
   export default {
     data() {
+      let validateUsername = (rule, value, callback) => {
+        if (!value) {
+          callback(new Error('请输入用户名'));
+        } else if (!/^\w{5,18}$/.test(value)) {
+          callback(new Error('用户名必须由5-18位数字、字母、下划线组成'));
+        } else {
+          callback();
+        }
+      }
+      let validatePassword = (rule, value, callback) => {
+        if (!value) {
+          callback(new Error('请输入密码'))
+        } else if (!/^.{5,18}$/.test(value)) {
+          callback(new Error('密码长度必须为5-18位'))
+        } else {
+          callback()
+        }
+      }
       return {
         searchForm: {
           name: '',
           dept: ''
         },
+        relateForm: {
+          username: this.username || '',
+          password: ''
+        },
         employees: [],
         deletedEmployees: [],
         depts: [],
+        currentEmpId: '',
+        relateFormVisible: false,
         loading: true,
         loadingDeleted: true,
-        showDeleted: false
+        showDeleted: false,
+        loginRule: {
+          username: [
+            {validator: validateUsername, trigger: 'blur'}
+          ],
+          password: [
+            {validator: validatePassword, trigger: 'blur'}
+          ]
+        },
       }
     },
     computed: {
       searchFormJson() {
         return JSON.stringify(this.searchForm)
-      }
+      },
+      ...mapGetters([
+        'username'
+      ])
     },
     watch: {
       // 如果路由有变化，会再次执行该方法
@@ -275,10 +338,65 @@
       hideRecover() {
         this.showDeleted = false
         this.loadingDeleted = false
+      },
+      relateUser(row) {
+        this.currentEmpId = row.id
+        this.relateFormVisible = true
+      },
+      relateSubmit() {
+        let self = this
+        let relateUrl = `${backEndUrl}/employee/relate_user.do`
+        axios.post(relateUrl, JSON.stringify({
+          id: self.currentEmpId,
+          username: self.relateForm.username,
+          password: self.relateForm.password
+        }), {
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8'
+          }
+        }).then((response) => {
+          if (response.data.status === SUCCESS) {
+            this.relateFormVisible = false
+            self.$message.success('关联成功')
+            self.getEmployees()
+          } else {
+            self.$message.error(response.data.msg)
+          }
+        })
+      },
+      unrelateUser(row) {
+        let self = this
+        let unrelateUrl = `${backEndUrl}/employee/unrelate_user.do`
+        this.$confirm('此操作将解除关联账号, 是否继续？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'danger'
+        }).then(() => {
+          axios.get(unrelateUrl, {
+            params: {
+              id: row.id
+            }
+          }).then((response) => {
+            if (response.data.status === SUCCESS) {
+              self.getEmployees()
+              self.$message({
+                type: 'success',
+                message: '解除成功!'
+              })
+            } else {
+              self.$message({
+                type: 'error',
+                message: '解除失败!'
+              })
+            }
+          })
+        }).catch(() => {
+          return
+        })
       }
     },
     mounted() {
-      console.log(this)
+      this.relateForm.username = this.username || ''
       this.getEmployees()
     }
   }

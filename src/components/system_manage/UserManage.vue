@@ -8,16 +8,15 @@
             <el-input v-model="searchForm.username" placeholder="用户名"></el-input>
           </el-form-item>
           <el-form-item label="员工姓名">
-            <el-input v-model="searchForm.name" placeholder="员工姓名"></el-input>
+            <el-input v-model="searchForm.empName" placeholder="员工姓名"></el-input>
           </el-form-item>
         </el-form>
       </div>
       <el-table
         :data="users"
         style="width: 100%"
-        @header-click="addUser"
         align="left"
-        :default-sort="{prop: 'dept.name', order: 'descending'}"
+        :default-sort="{prop: 'lastLoginTime', order: 'descending'}"
         v-loading.body="loading">
         <el-table-column
           class="column"
@@ -26,7 +25,7 @@
           label="用户名">
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="empName"
           label="员工姓名">
         </el-table-column>
         <el-table-column
@@ -69,35 +68,37 @@
         row-class-name="deleted-row"
         style="width: 100%"
         align="left"
-        :default-sort="{prop: 'dept.name', order: 'descending'}"
+        :default-sort="{prop: 'createTime', order: 'descending'}"
         v-loading.body="loadingDeleted">
         <el-table-column
           class="column"
-          prop="name"
-          label="用户名称"
-          sortable>
+          prop="username"
+          sortable
+          label="用户名">
         </el-table-column>
         <el-table-column
-          prop="tel"
-          label="电话">
-        </el-table-column>
-        <el-table-column
-          prop="type"
-          label="类别"
-          sortable>
-        </el-table-column>
-        <el-table-column
-          prop="dept.name"
-          label="部门"
-          sortable>
+          prop="empName"
+          label="员工姓名">
         </el-table-column>
         <el-table-column
           prop="remark"
           label="备注">
         </el-table-column>
         <el-table-column
-          prop="user"
-          label="账号">
+          prop="createTime"
+          sortable
+          label="创建时间">
+        </el-table-column>
+        <el-table-column
+          prop="lastLoginTime"
+          sortable
+          label="上次登录时间">
+        </el-table-column>
+        <el-table-column
+          label="角色">
+          <template scope="scope">
+            <span v-for="role in scope.row.roles">{{role.name}},&nbsp;</span>
+          </template>
         </el-table-column>
         <el-table-column label="操作">
           <template scope="scope">
@@ -127,7 +128,6 @@
         },
         users: [],
         deletedUsers: [],
-        depts: [],
         loading: true,
         loadingDeleted: true,
         showDeleted: false
@@ -141,6 +141,8 @@
     watch: {
       // 如果路由有变化，会再次执行该方法
       '$route': 'getUsers',
+
+      // 搜索表单出现变化后经过500ms自动向后端发送搜索请求
       searchFormJson: debounce(function () {
         this.search()
       }, 500)
@@ -152,7 +154,7 @@
         let searchUrl = `${backEndUrl}/user/get_users.do`
         axios.post(searchUrl, JSON.stringify({
           name: this.searchForm.name,
-          dept: this.searchForm.dept
+          username: this.searchForm.username
         }), {
           headers: {
             'Content-Type': 'application/json;charset=UTF-8'
@@ -160,6 +162,9 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             self.users = response.data.data
+            for (let user of self.users) {
+              user.empName = user.employee ? user.employee.name : ''
+            }
             self.loading = false
           }
         })
@@ -171,26 +176,12 @@
         axios.post(userUrl, {}).then((response) => {
           if (response.data.status === SUCCESS) {
             self.users = response.data.data
+            for (let user of self.users) {
+              user.empName = user.employee ? user.employee.name : ''
+            }
             self.loading = false
           }
         })
-      },
-      addUser(column) {
-        if (column.label === '用户名称　＋添加用户') {
-          let self = this
-          let addUserUrl = `${backEndUrl}/user/add_user.do`
-          axios.post(addUserUrl, {
-            name: '新建用户'
-          }, {
-            headers: {
-              'Content-Type': 'application/json; charset=UTF-8'
-            }
-          }).then((response) => {
-            if (response.data.status === SUCCESS) {
-              this.getUsers()
-            }
-          })
-        }
       },
       deleteUser(row) {
         let self = this
@@ -245,25 +236,12 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             self.deletedUsers = response.data.data
+            for (let user of self.deletedUsers) {
+              user.empName = user.employee ? user.employee.name : ''
+            }
             self.loadingDeleted = false
           }
         })
-      },
-      getDepts() {
-        let self = this
-        let deptUrl = `${backEndUrl}/dept/get_depts.do`
-        axios.get(deptUrl, {
-          params: {}
-        }).then((response) => {
-          if (response.data.status === SUCCESS) {
-            self.depts = response.data.data
-          }
-        })
-      },
-      selectShowed(flag) {
-        if (flag && this.depts.length === 0) {
-          this.getDepts()
-        }
       },
       hideRecover() {
         this.showDeleted = false
@@ -271,7 +249,6 @@
       }
     },
     mounted() {
-      console.log(this)
       this.getUsers()
     }
   }

@@ -87,7 +87,7 @@
     margin: 0;
     padding: 0;
     top: 0;
-    z-index: 1;
+    z-index: 2;
     background-color: aliceblue;
     position: fixed;
   }

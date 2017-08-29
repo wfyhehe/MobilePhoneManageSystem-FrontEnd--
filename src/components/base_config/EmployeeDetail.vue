@@ -26,7 +26,7 @@
         <el-input type="textarea" v-model="form.remark"></el-input>
       </el-form-item>
       <el-form-item label="系统账号">
-        <el-input v-model="form.user" :disabled="true"></el-input>
+        <el-input v-model="form.username" :disabled="true"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">确定</el-button>
@@ -51,7 +51,7 @@
           type: true,
           dept: '',
           remark: '',
-          user: ''
+          username: ''
         },
         employee: {},
         depts: []
@@ -120,21 +120,21 @@
           self.form.type = employee.type === 'SALES'
           self.form.dept = employee.dept ? employee.dept.name : ''
           self.form.remark = employee.remark
-          self.form.user = employee.user ? employee.user.name : ''
+          self.form.username = employee.user ? employee.user.username : ''
         }
       })
     }
   }
 </script>
 
-<style>
+<style scoped="scoped">
   .employee-detail {
     width: 100%;
     height: 100%;
     margin: 0;
     padding: 0;
     top: 0;
-    z-index: 1;
+    z-index: 2;
     background-color: aliceblue;
     position: fixed;
   }

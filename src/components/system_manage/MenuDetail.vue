@@ -12,12 +12,13 @@
         <el-input type="textarea" v-model="form.remark"></el-input>
       </el-form-item>
       <el-form-item label="授权">
-        <el-checkbox-group v-model="checkList">
-          <el-checkbox v-for="(role, i) in roles"
+        <el-checkbox-group v-model="form.roleNames">
+          <el-checkbox v-for="(role, i) in allRoles"
                        :key="i"
                        :label="role.name"
-                       :disabled="isSuperAdmin(role)"
-                       :checked="isGranted(role)"></el-checkbox>
+                       :disabled="isSuperAdmin(role)">
+            {{role.name}}
+          </el-checkbox>
         </el-checkbox-group>
       </el-form-item>
       <el-form-item>
@@ -38,14 +39,27 @@
         form: {
           name: '',
           path: '',
-          remark: ''
+          remark: '',
+          roleNames: []
         },
         menu: {},
-        roles: [],
-        checkList: []
+        allRoles: []
       }
     },
     methods: {
+      formatData(data) {
+        let dataCopy = JSON.parse(JSON.stringify(data))
+        let newData = {}
+        newData.name = dataCopy.name
+        newData.path = dataCopy.path
+        newData.remark = dataCopy.remark
+        let names = []
+        for (let role of dataCopy.roles) {
+          names.push(role.name)
+        }
+        newData.roleNames = names
+        return newData
+      },
       onSubmit() {
         let self = this
         let updateMenuUrl = `${backEndUrl}/menu/update_menu.do`
@@ -54,8 +68,7 @@
           name: self.form.name,
           path: self.form.path,
           remark: self.form.remark,
-          type: self.form.type,
-          roles: self.checkList
+          roleNames: self.form.roleNames
         }), {
           headers: {
             'Content-Type': 'application/json;charset=UTF-8'
@@ -72,14 +85,6 @@
       onCancel() {
         this.$router.back()
       },
-      isGranted(role) {
-        for (let r of this.menu.roles) {
-          if (r.name === role.name) {
-            return true
-          }
-        }
-        return false
-      },
       isSuperAdmin(role) {
         return role.name === '超级管理员'
       }
@@ -87,30 +92,22 @@
     mounted() {
       let self = this
       let getMenuUrl = `${backEndUrl}/menu/get_menu.do`
-      let rolesUrl = `${backEndUrl}/role/get_roles.do`
+      let getRolesUrl = `${backEndUrl}/role/get_roles.do`
       axios.get(getMenuUrl, {
         params: {
           id: self.$route.params.id
         }
       }).then(response => {
         if (response.data.status === SUCCESS) {
-          let menu = response.data.data
-          self.menu = menu
-          self.form.name = menu.name
-          self.form.path = menu.path
-          self.form.remark = menu.remark
+          self.menu = response.data.data
+          self.form = self.formatData(self.menu)
         }
       })
-      axios.get(rolesUrl, {}).then(response => {
+      axios.get(getRolesUrl, {}).then(response => {
         if (response.data.status === SUCCESS) {
-          self.roles = response.data.data.sort((a, b) => {
-              return a.id.localeCompare(b.id)
-            }
-          )
-          console.log(self.roles)
+          self.allRoles = response.data.data
         }
       })
-
     }
   }
 </script>
@@ -122,7 +119,7 @@
     margin: 0;
     padding: 0;
     top: 0;
-    z-index: 1;
+    z-index: 2;
     background-color: aliceblue;
     position: fixed;
   }

@@ -45,8 +45,8 @@
     methods: {
       onSubmit() {
         let self = this
-        let updateDeptUrl = `${backEndUrl}/dept/update_dept.do`
-        axios.post(updateDeptUrl, JSON.stringify({
+        let updatedeptUrl = `${backEndUrl}/dept/update_dept.do`
+        axios.post(updatedeptUrl, JSON.stringify({
           id: self.$route.params.id,
           name: self.form.name,
           address: self.form.address,

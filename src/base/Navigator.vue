@@ -20,7 +20,7 @@
       <el-submenu :index="menu.name || ''" v-for="(menu, i) in menus" :key="i"
                   v-loading.body="loading">
         <template slot="title">{{menu.name}}</template>
-        <el-menu-item :index="submenu.path || ''"
+        <el-menu-item :index="submenu.path? '/' + submenu.path : ''"
                       v-for="(submenu, subi) in menu.children"
                       :key="subi"
                       v-if="menu.type === 'PARENT'">
