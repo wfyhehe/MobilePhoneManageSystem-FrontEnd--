@@ -17,7 +17,7 @@
             <!--<el-input v-model="searchForm.dept" placeholder="部门"></el-input>-->
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="search">查询</el-button>
+            <el-button type="primary" @click="getEmployees">查询</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -78,6 +78,13 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-pagination
+        layout="prev, pager, next"
+        :total="count"
+        :current-page="pageIndex"
+        :page-size="pageSize"
+        @current-change="getEmployees">
+      </el-pagination>
       <div class="recover">
         <el-button @click="getDeletedEmployees" :plain="true" v-show="!showDeleted" type="info">显示已删除员工</el-button>
         <el-button @click="hideRecover" :plain="true" v-show="showDeleted" type="info">隐藏已删除员工</el-button>
@@ -153,6 +160,8 @@
   import {debounce} from '@/common/util'
   import {mapGetters} from 'vuex'
 
+  const PAGE_SIZE = 5
+
   export default {
     data() {
       let validateUsername = (rule, value, callback) => {
@@ -190,6 +199,9 @@
         loading: true,
         loadingDeleted: true,
         showDeleted: false,
+        pageIndex: 1,
+        pageSize: PAGE_SIZE,
+        count: 0,
         loginRule: {
           username: [
             {validator: validateUsername, trigger: 'blur'}
@@ -212,17 +224,19 @@
       // 如果路由有变化，会再次执行该方法
       '$route': 'getEmployees',
       searchFormJson: debounce(function () {
-        this.search()
+        this.getEmployees()
       }, 500)
     },
     methods: {
-      search() {
+      getEmployees(index) {
         this.loading = true
         let self = this
         let searchUrl = `${backEndUrl}/employee/get_employees.do`
         axios.post(searchUrl, JSON.stringify({
           name: this.searchForm.name,
-          dept: this.searchForm.dept
+          dept: this.searchForm.dept,
+          pageIndex: index || this.pageIndex,
+          pageSize: PAGE_SIZE
         }), {
           headers: {
             'Content-Type': 'application/json;charset=UTF-8'
@@ -230,17 +244,7 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             self.employees = response.data.data
-            self.loading = false
-          }
-        })
-      },
-      getEmployees() {
-        this.loading = true
-        let self = this
-        let employeeUrl = `${backEndUrl}/employee/get_employees.do`
-        axios.post(employeeUrl, {}).then((response) => {
-          if (response.data.status === SUCCESS) {
-            self.employees = response.data.data
+            self.count = response.data.count
             self.loading = false
           }
         })
@@ -284,7 +288,6 @@
             message: '删除成功!'
           })
         }).catch(() => {
-          return
         })
       },
       editEmployee(row) {
@@ -391,7 +394,6 @@
             }
           })
         }).catch(() => {
-          return
         })
       }
     },

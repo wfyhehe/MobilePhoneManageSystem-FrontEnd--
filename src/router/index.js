@@ -91,6 +91,12 @@ const EmployeeDetail = (resolve) => {
   })
 }
 
+const LogManage = (resolve) => {
+  import('@/components/system_manage/LogManage').then((module) => {
+    resolve(module)
+  })
+}
+
 Vue.use(Router);
 
 export default new Router({
@@ -147,5 +153,8 @@ export default new Router({
       path: ':id',
       component: EmployeeDetail
     }]
+  }, {
+    path: '/log_manage',
+    component: LogManage
   }]
 })

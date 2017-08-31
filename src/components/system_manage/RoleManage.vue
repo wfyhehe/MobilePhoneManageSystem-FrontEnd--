@@ -139,7 +139,6 @@
             message: '删除成功!'
           })
         }).catch(() => {
-          return
         })
       },
       editRole(row) {

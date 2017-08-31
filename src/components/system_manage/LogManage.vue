@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="user-manage">
+    <div class="user-manage" v-if="false">
       <h2>用户管理</h2>
       <div class="search">
         <el-form :inline="true" :model="searchForm">
