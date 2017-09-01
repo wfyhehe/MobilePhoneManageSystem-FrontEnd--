@@ -97,6 +97,42 @@ const LogManage = (resolve) => {
   })
 }
 
+const SupplierType = (resolve) => {
+  import('@/components/base_config/SupplierType').then((module) => {
+    resolve(module)
+  })
+}
+
+const SupplierTypeDetail = (resolve) => {
+  import('@/components/base_config/SupplierTypeDetail').then((module) => {
+    resolve(module)
+  })
+}
+
+const Supplier = (resolve) => {
+  import('@/components/base_config/Supplier').then((module) => {
+    resolve(module)
+  })
+}
+
+const SupplierDetail = (resolve) => {
+  import('@/components/base_config/SupplierDetail').then((module) => {
+    resolve(module)
+  })
+}
+
+const RebateType = (resolve) => {
+  import('@/components/base_config/RebateType').then((module) => {
+    resolve(module)
+  })
+}
+
+const RebateTypeDetail = (resolve) => {
+  import('@/components/base_config/RebateTypeDetail').then((module) => {
+    resolve(module)
+  })
+}
+
 Vue.use(Router);
 
 export default new Router({
@@ -156,5 +192,26 @@ export default new Router({
   }, {
     path: '/log_manage',
     component: LogManage
+  }, {
+    path: '/supplier_type',
+    component: SupplierType,
+    children: [{
+      path: ':id',
+      component: SupplierTypeDetail
+    }]
+  }, {
+    path: '/supplier',
+    component: Supplier,
+    children: [{
+      path: ':id',
+      component: SupplierDetail
+    }]
+  }, {
+    path: '/rebate_type',
+    component: RebateType,
+    children: [{
+      path: ':id',
+      component: RebateTypeDetail
+    }]
   }]
 })

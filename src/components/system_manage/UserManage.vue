@@ -57,6 +57,13 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-pagination
+        layout="prev, pager, next"
+        :total="count"
+        :current-page="pageIndex"
+        :page-size="pageSize"
+        @current-change="getUsers">
+      </el-pagination>
       <div class="recover">
         <el-button @click="getDeletedUsers" :plain="true" v-show="!showDeleted" type="info">显示已删除用户</el-button>
         <el-button @click="hideRecover" :plain="true" v-show="showDeleted" type="info">隐藏已删除用户</el-button>
@@ -119,18 +126,23 @@
   import {backEndUrl, SUCCESS} from '@/common/config'
   import {debounce} from '@/common/util'
 
+  const PAGE_SIZE = 10
+
   export default {
     data() {
       return {
         searchForm: {
-          name: '',
+          empName: '',
           username: ''
         },
         users: [],
         deletedUsers: [],
         loading: true,
         loadingDeleted: true,
-        showDeleted: false
+        showDeleted: false,
+        pageIndex: 1,
+        pageSize: PAGE_SIZE,
+        count: 0,
       }
     },
     computed: {
@@ -144,17 +156,22 @@
 
       // 搜索表单出现变化后经过500ms自动向后端发送搜索请求
       searchFormJson: debounce(function () {
-        this.search()
+        this.getUsers()
       }, 500)
     },
     methods: {
-      search() {
+      getUsers(index) {
+        if (index % 1 !== 0) {
+          index = null
+        }
         this.loading = true
         let self = this
         let searchUrl = `${backEndUrl}/user/get_users.do`
         axios.post(searchUrl, JSON.stringify({
-          name: this.searchForm.name,
-          username: this.searchForm.username
+          name: this.searchForm.empName,
+          username: this.searchForm.username,
+          pageIndex: index || this.pageIndex,
+          pageSize: PAGE_SIZE
         }), {
           headers: {
             'Content-Type': 'application/json;charset=UTF-8'
@@ -165,20 +182,7 @@
             for (let user of self.users) {
               user.empName = user.employee ? user.employee.name : ''
             }
-            self.loading = false
-          }
-        })
-      },
-      getUsers() {
-        this.loading = true
-        let self = this
-        let userUrl = `${backEndUrl}/user/get_users.do`
-        axios.post(userUrl, {}).then((response) => {
-          if (response.data.status === SUCCESS) {
-            self.users = response.data.data
-            for (let user of self.users) {
-              user.empName = user.employee ? user.employee.name : ''
-            }
+            self.count = response.data.count
             self.loading = false
           }
         })
@@ -253,11 +257,7 @@
   }
 </script>
 
-<style>
-  /*th .cell {*/
-  /*cursor: pointer;*/
-  /*}*/
-
+<style scoped>
   .user-manage {
   }
 

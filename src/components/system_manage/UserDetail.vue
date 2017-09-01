@@ -122,7 +122,7 @@
   }
 </script>
 
-<style>
+<style scoped>
   .user-detail {
     width: 100%;
     height: 100%;

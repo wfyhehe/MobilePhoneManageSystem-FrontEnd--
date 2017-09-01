@@ -2,6 +2,7 @@
   <div>
     <div class="employee-manage">
       <h2>员工管理</h2>
+      <el-button class="add" size="small" @click="addEmployee"><i class="el-icon-plus"></i> 添加新员工</el-button>
       <div class="search">
         <el-form :inline="true" :model="searchForm">
           <el-form-item label="员工姓名">
@@ -24,7 +25,6 @@
       <el-table
         :data="employees"
         style="width: 100%"
-        @header-click="addEmployee"
         align="left"
         :default-sort="{prop: 'dept.name', order: 'descending'}"
         v-loading.body="loading">
@@ -32,7 +32,7 @@
           class="column"
           prop="name"
           sortable
-          label="员工名称　＋添加员工">
+          label="员工名称">
         </el-table-column>
         <el-table-column
           prop="tel"
@@ -136,7 +136,7 @@
         </el-table-column>
       </el-table>
     </div>
-    <el-dialog title="收货地址" :visible.sync="relateFormVisible">
+    <el-dialog title="关联账号" :visible.sync="relateFormVisible">
       <el-form :model="relateForm" :rules="loginRule" label-width="100px">
         <el-form-item label="用户名" prop="username">
           <el-input type="text" v-model="relateForm.username"></el-input>
@@ -150,6 +150,37 @@
         <el-button type="primary" @click="relateSubmit">确 定</el-button>
       </div>
     </el-dialog>
+    <el-dialog title="新建员工" :visible.sync="addFormVisible">
+      <el-form :model="addForm" :rules="addRule" label-width="100px">
+        <el-form-item label="员工姓名">
+          <el-input v-model="addForm.name"></el-input>
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input v-model="addForm.tel"></el-input>
+        </el-form-item>
+        <el-form-item label="类别">
+          <el-switch
+            v-model="addForm.type"
+            :width="80"
+            on-text="销售员"
+            off-text="其他">
+          </el-switch>
+        </el-form-item>
+        <el-form-item label="部门">
+          <el-select v-model="addForm.dept" placeholder="请选择部门" @visible-change="selectShowed">
+            <el-option label="未定" value=""></el-option>
+            <el-option v-for="(item, i) in depts" :key="i" :label="item.name" :value="item.name"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input type="textarea" v-model="addForm.remark"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="addFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="onAddSubmit">确 定</el-button>
+      </div>
+    </el-dialog>
     <router-view></router-view>
   </div>
 </template>
@@ -160,7 +191,7 @@
   import {debounce} from '@/common/util'
   import {mapGetters} from 'vuex'
 
-  const PAGE_SIZE = 5
+  const PAGE_SIZE = 10
 
   export default {
     data() {
@@ -191,11 +222,20 @@
           username: this.username || '',
           password: ''
         },
+        addForm: {
+          name: '',
+          tel: '',
+          type: true,
+          dept: '',
+          remark: '',
+          username: ''
+        },
         employees: [],
         deletedEmployees: [],
         depts: [],
         currentEmpId: '',
         relateFormVisible: false,
+        addFormVisible: false,
         loading: true,
         loadingDeleted: true,
         showDeleted: false,
@@ -210,6 +250,7 @@
             {validator: validatePassword, trigger: 'blur'}
           ]
         },
+        addRule: {}
       }
     },
     computed: {
@@ -222,20 +263,23 @@
     },
     watch: {
       // 如果路由有变化，会再次执行该方法
-      '$route': 'getEmployees',
       searchFormJson: debounce(function () {
         this.getEmployees()
-      }, 500)
+      }, 500),
+      '$route': 'getEmployees'
     },
     methods: {
       getEmployees(index) {
+        if (index % 1 !== 0) {
+          index = null
+        }
         this.loading = true
         let self = this
         let searchUrl = `${backEndUrl}/employee/get_employees.do`
         axios.post(searchUrl, JSON.stringify({
-          name: this.searchForm.name,
-          dept: this.searchForm.dept,
-          pageIndex: index || this.pageIndex,
+          name: self.searchForm.name,
+          dept: self.searchForm.dept,
+          pageIndex: index || self.pageIndex,
           pageSize: PAGE_SIZE
         }), {
           headers: {
@@ -249,22 +293,31 @@
           }
         })
       },
-      addEmployee(column) {
-        if (column.label === '员工名称　＋添加员工') {
-          let self = this
-          let addEmployeeUrl = `${backEndUrl}/employee/add_employee.do`
-          axios.post(addEmployeeUrl, {
-            name: '新建员工'
-          }, {
-            headers: {
-              'Content-Type': 'application/json; charset=UTF-8'
-            }
-          }).then((response) => {
-            if (response.data.status === SUCCESS) {
-              this.getEmployees()
-            }
-          })
-        }
+      addEmployee() {
+        this.addFormVisible = true
+      },
+      onAddSubmit() {
+        let self = this
+        let addEmployeeUrl = `${backEndUrl}/employee/add_employee.do`
+        axios.post(addEmployeeUrl, JSON.stringify({
+          name: self.addForm.name,
+          tel: self.addForm.tel,
+          type: self.addForm.type ? 'SALES' : 'OTHER',
+          dept: self.addForm.dept,
+          remark: self.addForm.remark
+        }), {
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8'
+          }
+        }).then((response) => {
+          if (response.data.status === SUCCESS) {
+            self.$message.success('添加成功')
+            self.getEmployees()
+            self.addFormVisible = false
+          } else {
+            self.$message.error(response.data.msg)
+          }
+        })
       },
       deleteEmployee(row) {
         let self = this
@@ -404,10 +457,7 @@
   }
 </script>
 
-<style>
-  /*th .cell {*/
-  /*cursor: pointer;*/
-  /*}*/
+<style scoped>
 
   .employee-manage {
   }
@@ -423,6 +473,11 @@
   .recover {
     float: right;
     margin: 10px 40px 10px 0;
+  }
+
+  .add {
+    float: left;
+    margin: 10px 40px 10px 10px;
   }
 
   h1, h2, h3 {

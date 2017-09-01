@@ -112,7 +112,7 @@
   }
 </script>
 
-<style>
+<style scoped>
   .menu-detail {
     width: 100%;
     height: 100%;

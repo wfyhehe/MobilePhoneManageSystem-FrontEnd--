@@ -2,16 +2,16 @@
   <div>
     <div class="dept-manage">
       <h2>部门管理</h2>
+      <el-button class="add" size="small" @click="addDept"><i class="el-icon-plus"></i> 添加新部门</el-button>
       <el-table
         :data="depts"
         style="width: 100%"
-        @header-click="addDept"
         align="left"
         v-loading.body="loading">
         <el-table-column
           class="column"
           prop="name"
-          label="部门名称　＋添加部门">
+          label="部门名称">
         </el-table-column>
         <el-table-column
           prop="address"
@@ -75,7 +75,8 @@
           <template scope="scope">
             <el-button
               size="small"
-              @click="recoverDept(scope.row)">恢复</el-button>
+              @click="recoverDept(scope.row)">恢复
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -116,23 +117,21 @@
           }
         })
       },
-      addDept(column) {
-        if (column.label === '部门名称　＋添加部门') {
-          let self = this
-          let addDeptUrl = `${backEndUrl}/dept/add_dept.do`
-          axios.post(addDeptUrl, {
-            name: '新建部门',
-            address: '比基尼海滩裤头村菠萝屋'
-          }, {
-            headers: {
-              'Content-Type': 'application/json; charset=UTF-8'
-            }
-          }).then((response) => {
-            if (response.data.status === SUCCESS) {
-              this.getDepts()
-            }
-          })
-        }
+      addDept() {
+        let self = this
+        let addDeptUrl = `${backEndUrl}/dept/add_dept.do`
+        axios.post(addDeptUrl, {
+          name: '新建部门',
+          address: '比基尼海滩裤头村菠萝屋'
+        }, {
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8'
+          }
+        }).then((response) => {
+          if (response.data.status === SUCCESS) {
+            this.getDepts()
+          }
+        })
       },
       deleteDept(row) {
         let self = this
@@ -165,7 +164,7 @@
         let self = this
         let recoverDeptUrl = `${backEndUrl}/dept/recover_dept.do`
         axios.get(recoverDeptUrl, {
-          params:{
+          params: {
             id: row.id
           }
         }).then((response) => {
@@ -201,10 +200,7 @@
   }
 </script>
 
-<style>
-  th .cell {
-    cursor: pointer;
-  }
+<style scoped>
 
   .dept-manage {
   }
@@ -220,6 +216,11 @@
   .recover {
     float: right;
     margin: 10px 40px 10px 0;
+  }
+
+  .add {
+    float: left;
+    margin: 10px 40px 10px 10px;
   }
 
   h1, h2, h3 {

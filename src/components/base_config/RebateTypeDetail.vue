@@ -1,15 +1,12 @@
 <template>
-  <div class="role-detail">
+  <div class="rebate-type-detail">
     <el-form ref="form" :model="form" class="form" label-width="80px">
-      <h3>修改角色项</h3>
-      <el-form-item label="角色名称">
+      <h3>修改返利类型项</h3>
+      <el-form-item label="名称" prop="name">
         <el-input v-model="form.name"></el-input>
       </el-form-item>
-      <el-form-item label="角色说明">
+      <el-form-item label="备注" prop="remark">
         <el-input type="textarea" v-model="form.remark"></el-input>
-      </el-form-item>
-      <el-form-item label="启用">
-        <el-switch on-text="" off-text="" v-model="form.online"></el-switch>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">确定</el-button>
@@ -22,27 +19,27 @@
 <script>
   import axios from 'axios'
   import {backEndUrl, SUCCESS} from '@/common/config'
+  import ElFormItem from "../../../node_modules/element-ui/packages/form/src/form-item.vue";
 
   export default {
+    components: {ElFormItem},
     data() {
       return {
         form: {
           name: '',
-          remark: '',
-          online: true
+          remark: ''
         },
-        role: {}
+        rebateType: {}
       }
     },
     methods: {
       onSubmit() {
         let self = this
-        let updateRoleUrl = `${backEndUrl}/role/update_role.do`
-        axios.post(updateRoleUrl, JSON.stringify({
-          id: self.$route.params.id,
+        let updateRebateTypeUrl = `${backEndUrl}/rebate_type/update_rebate_type.do`
+        axios.post(updateRebateTypeUrl, JSON.stringify({
+          id: self.form.id,
           name: self.form.name,
-          remark: self.form.remark,
-          status: self.form.online ? 'ONLINE' : 'OFFLINE'
+          remark: self.form.remark
         }), {
           headers: {
             'Content-Type': 'application/json;charset=UTF-8'
@@ -62,18 +59,18 @@
     },
     mounted() {
       let self = this
-      let getRoleUrl = `${backEndUrl}/role/get_role.do`
-      axios.get(getRoleUrl, {
+      let getRebateTypeUrl = `${backEndUrl}/rebate_type/get_rebate_type.do`
+      axios.get(getRebateTypeUrl, {
         params: {
           id: self.$route.params.id
         }
       }).then(response => {
         if (response.data.status === SUCCESS) {
-          let role = response.data.data
-          self.role = role
-          self.form.name = role.name
-          self.form.remark = role.remark
-          self.form.online = role.status === 'ONLINE'
+          let rebateType = response.data.data
+          self.rebateType = rebateType
+          self.form.id = rebateType.id,
+            self.form.name = rebateType.name
+          self.form.remark = rebateType.remark
         }
       })
     }
@@ -81,7 +78,7 @@
 </script>
 
 <style scoped>
-  .role-detail {
+  .rebate-type-detail {
     width: 100%;
     height: 100%;
     margin: 0;

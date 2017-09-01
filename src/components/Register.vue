@@ -136,7 +136,7 @@
           }
         }).then(function (response) {
 //          if (response.data.status === SUCCESS) {
-          if (response.data.status !== SUCCESS) { // 跨域问题不好调试，发布时用上面的
+          if (response.data.status !== SUCCESS) { // TODO 跨域问题不好调试，发布时用上面的
             axios.post(registerUrl, {
               username: self.registerForm.username,
               password: self.registerForm.password

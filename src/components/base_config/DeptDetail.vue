@@ -92,7 +92,7 @@
   }
 </script>
 
-<style>
+<style scoped>
   .dept-detail {
     width: 100%;
     height: 100%;

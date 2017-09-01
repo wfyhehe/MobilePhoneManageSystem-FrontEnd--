@@ -253,10 +253,7 @@
   }
 </script>
 
-<style>
-  /*th .cell {*/
-  /*cursor: pointer;*/
-  /*}*/
+<style scoped>
 
   .user-manage {
   }

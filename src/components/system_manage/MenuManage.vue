@@ -2,16 +2,16 @@
   <div>
     <div class="menu-manage" v-show="true">
       <h2>菜单管理</h2>
+      <el-button class="add" size="small" @click="addTop"><i class="el-icon-plus"></i> 添加顶级菜单</el-button>
       <el-table
         :data="menus"
         style="width: 100%"
-        @header-click="addTop"
         align="left"
         v-loading.body="loading">
         <el-table-column
           class="column"
           prop="name"
-          label="菜单名称　＋添加菜单">
+          label="菜单名称">
         </el-table-column>
         <el-table-column
           prop="path"
@@ -100,25 +100,24 @@
           }
         })
       },
-      addTop(column) {
-        if (column.label === '菜单名称　＋添加菜单') {
-          let self = this
-          let addMenuUrl = `${backEndUrl}/menu/add_menu.do`
-          let sortOrder = 1
-          for (let topMenu of this.rawMenus) {
-            if (topMenu.sortOrder >= sortOrder) {
-              sortOrder = topMenu.sortOrder + 1
-            }
+      addTop() {
+        let self = this
+        let addMenuUrl = `${backEndUrl}/menu/add_menu.do`
+        let sortOrder = 1
+        for (let topMenu of this.rawMenus) {
+          if (topMenu.sortOrder >= sortOrder) {
+            sortOrder = topMenu.sortOrder + 1
           }
-          axios.post(addMenuUrl, {
-            name: '新建菜单项',
-            sortOrder
-          }).then((response) => {
-            if (response.data.status === SUCCESS) {
-              this.getMenus()
-            }
-          })
         }
+        axios.post(addMenuUrl, {
+          name: '新建菜单项',
+          sortOrder
+        }).then((response) => {
+          if (response.data.status === SUCCESS) {
+            this.getMenus()
+          }
+        })
+
       },
       isLeaf(index) {
         return this.menus[index].type === 'NODE'
@@ -192,7 +191,6 @@
       },
       editMenu(row) {
         this.$router.push(`/menu_manage/${row.id}`)
-        this.toggleDetail = true
       }
     },
     mounted() {
@@ -201,8 +199,17 @@
   }
 </script>
 
-<style>
-  th .cell {
-    cursor: pointer;
+<style scoped>
+
+  .menu-manage {
+  }
+
+  .add {
+    float: left;
+    margin: 10px 40px 10px 10px;
+  }
+
+  h1, h2, h3 {
+    margin: 30px;
   }
 </style>
