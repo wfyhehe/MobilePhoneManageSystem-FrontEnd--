@@ -115,10 +115,7 @@
       '$route': 'getRebateTypes'
     },
     methods: {
-      getRebateTypes(index) {
-        if (index % 1 !== 0) {
-          index = null
-        }
+      getRebateTypes() {
         this.loading = true
         let self = this
         let searchUrl = `${backEndUrl}/rebate_type/get_rebate_types.do`
@@ -171,11 +168,16 @@
           }).then((response) => {
             if (response.data.status === SUCCESS) {
               self.getRebateTypes()
+              self.$message({
+                type: 'success',
+                message: '删除成功!'
+              })
+            } else {
+              self.$message({
+                type: 'error',
+                message: response.data.msg
+              })
             }
-          })
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
           })
         }).catch(() => {
         })

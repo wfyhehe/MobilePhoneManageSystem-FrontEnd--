@@ -133,6 +133,36 @@ const RebateTypeDetail = (resolve) => {
   })
 }
 
+const Color = (resolve) => {
+  import('@/components/base_config/Color').then((module) => {
+    resolve(module)
+  })
+}
+
+const Brand = (resolve) => {
+  import('@/components/base_config/Brand').then((module) => {
+    resolve(module)
+  })
+}
+
+const Config = (resolve) => {
+  import('@/components/base_config/Config').then((module) => {
+    resolve(module)
+  })
+}
+
+const MobileModel = (resolve) => {
+  import('@/components/base_config/MobileModel').then((module) => {
+    resolve(module)
+  })
+}
+
+const MobileModelDetail = (resolve) => {
+  import('@/components/base_config/MobileModelDetail').then((module) => {
+    resolve(module)
+  })
+}
+
 Vue.use(Router);
 
 export default new Router({
@@ -212,6 +242,22 @@ export default new Router({
     children: [{
       path: ':id',
       component: RebateTypeDetail
+    }]
+  }, {
+    path: '/color',
+    component: Color
+  }, {
+    path: '/brand',
+    component: Brand
+  }, {
+    path: '/config',
+    component: Config
+  }, {
+    path: '/mobile_model',
+    component: MobileModel,
+    children: [{
+      path: ':id',
+      component: MobileModelDetail
     }]
   }]
 })

@@ -5,8 +5,8 @@
       <el-button class="add" size="small" @click="addSupplier"><i class="el-icon-plus"></i> 添加供应商</el-button>
       <div class="search">
         <el-form :inline="true" :model="searchForm">
-          <el-form-item label="供应商姓名">
-            <el-input v-model="searchForm.name" placeholder="供应商姓名"></el-input>
+          <el-form-item label="供应商名">
+            <el-input v-model="searchForm.name" placeholder="供应商名"></el-input>
           </el-form-item>
           <el-form-item label="类别">
             <el-select v-model="searchForm.type"
@@ -180,7 +180,6 @@
   export default {
     data() {
       let validateId = (rule, value, callback) => {
-        console.log(value)
         if (!value) {
           callback(new Error('请输入编号'));
         } else if (!/^[0-9A-Z-]{1,15}$/.test(value)) {
@@ -339,11 +338,16 @@
           }).then((response) => {
             if (response.data.status === SUCCESS) {
               self.getSuppliers()
+              self.$message({
+                type: 'success',
+                message: '删除成功!'
+              })
+            } else {
+              self.$message({
+                type: 'error',
+                message: response.data.msg
+              })
             }
-          })
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
           })
         }).catch(() => {
         })

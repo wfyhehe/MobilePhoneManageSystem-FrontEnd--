@@ -161,9 +161,7 @@
     },
     methods: {
       getUsers(index) {
-        if (index % 1 !== 0) {
-          index = null
-        }
+
         this.loading = true
         let self = this
         let searchUrl = `${backEndUrl}/user/get_users.do`
@@ -202,11 +200,16 @@
           }).then((response) => {
             if (response.data.status === SUCCESS) {
               self.getUsers()
+              self.$message({
+                type: 'success',
+                message: '删除成功!'
+              })
+            } else {
+              self.$message({
+                type: 'error',
+                message: response.data.msg
+              })
             }
-          })
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
           })
         }).catch(() => {
         })
@@ -257,7 +260,11 @@
   }
 </script>
 
-<style scoped>
+<style>
+  /*th .cell {*/
+  /*cursor: pointer;*/
+  /*}*/
+
   .user-manage {
   }
 

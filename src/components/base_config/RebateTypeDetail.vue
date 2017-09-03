@@ -68,8 +68,8 @@
         if (response.data.status === SUCCESS) {
           let rebateType = response.data.data
           self.rebateType = rebateType
-          self.form.id = rebateType.id,
-            self.form.name = rebateType.name
+          self.form.id = rebateType.id
+          self.form.name = rebateType.name
           self.form.remark = rebateType.remark
         }
       })

@@ -148,11 +148,16 @@
           }).then((response) => {
             if (response.data.status === SUCCESS) {
               self.getDepts()
+              self.$message({
+                type: 'success',
+                message: '删除成功!'
+              })
+            } else {
+              self.$message({
+                type: 'error',
+                message: response.data.msg
+              })
             }
-          })
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
           })
         }).catch(() => {
         })
