@@ -7,7 +7,7 @@
       <div class="search">
         <el-form :inline="true" :model="searchForm">
           <el-form-item label="手机型号">
-            <el-input v-model="searchForm.model" placeholder="手机型号"></el-input>
+            <el-input v-model="searchForm.name" placeholder="手机型号"></el-input>
           </el-form-item>
           <el-form-item label="品牌">
             <el-select v-model="searchForm.brand"
@@ -50,23 +50,25 @@
           prop="rebatePrices"
           label="返利价格">
           <template scope="scope">
-            {{scope.row.rebatePrices}}
-            <!--<el-popover trigger="hover" placement="top">-->
-            <!--<el-table-->
-            <!--:data="scope.row">-->
-            <!--<el-table-column-->
-            <!--prop="rebateType.name"-->
-            <!--label="返利类别">-->
-            <!--</el-table-column>-->
-            <!--<el-table-column-->
-            <!--prop="price"-->
-            <!--label="返利价格">-->
-            <!--</el-table-column>-->
-            <!--</el-table>-->
-            <!--<div slot="reference" class="name-wrapper">-->
-            <!--<el-tag>查看返利价格</el-tag>-->
-            <!--</div>-->
-            <!--</el-popover>-->
+            <el-popover trigger="hover" placement="top">
+              <el-table
+                :fit="false"
+                :data="scope.row.rebatePrices">
+                <el-table-column
+                  width="150"
+                  prop="rebateType.name"
+                  label="返利类别">
+                </el-table-column>
+                <el-table-column
+                  width="120"
+                  prop="price"
+                  label="返利价格">
+                </el-table-column>
+              </el-table>
+              <div slot="reference" class="name-wrapper">
+                <el-tag>查看返利价格</el-tag>
+              </div>
+            </el-popover>
           </template>
         </el-table-column>
         <el-table-column
@@ -131,15 +133,20 @@
           label="进货价">
         </el-table-column>
         <el-table-column
+          prop="rebatePrices"
           label="返利价格">
           <template scope="scope">
             <el-popover trigger="hover" placement="top">
-              <el-table :data="scope.row">
+              <el-table
+                :fit="false"
+                :data="scope.row.rebatePrices">
                 <el-table-column
+                  width="150"
                   prop="rebateType.name"
                   label="返利类别">
                 </el-table-column>
                 <el-table-column
+                  width="120"
                   prop="price"
                   label="返利价格">
                 </el-table-column>
@@ -280,7 +287,6 @@
         }
       }
       let validateBuyingPrice = (rule, value, callback) => {
-        console.log(value)
         if (value) {
           if (!/^\d+(\.\d+)?$/.test(value)) {
             callback(new Error('请输入非负实数'))
@@ -294,7 +300,7 @@
       return {
         searchForm: {
           name: '',
-          brand: {}
+          brand: '',
         },
         addForm: {
           id: '',

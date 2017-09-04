@@ -163,6 +163,17 @@ const MobileModelDetail = (resolve) => {
   })
 }
 
+const Account = (resolve) => {
+  import('@/components/account_business/Account').then((module) => {
+    resolve(module)
+  })
+}
+
+const AccountDetail = (resolve) => {
+  import('@/components/account_business/AccountDetail').then((module) => {
+    resolve(module)
+  })
+}
 Vue.use(Router);
 
 export default new Router({
@@ -258,6 +269,13 @@ export default new Router({
     children: [{
       path: ':id',
       component: MobileModelDetail
+    }]
+  }, {
+    path: '/account',
+    component: Account,
+    children: [{
+      path: ':id',
+      component: AccountDetail
     }]
   }]
 })
