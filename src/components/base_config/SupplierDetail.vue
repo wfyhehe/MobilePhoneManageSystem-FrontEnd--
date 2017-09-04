@@ -3,7 +3,7 @@
     <el-form ref="form" :model="form" class="form" label-width="80px">
       <h3>修改供应商项</h3>
       <el-form-item label="供应商编号">
-        <el-input v-model="form.id" :disabled="true"></el-input>
+        <el-input v-model="form.id" :readonly="true"></el-input>
       </el-form-item>
       <el-form-item label="名称">
         <el-input v-model="form.name"></el-input>

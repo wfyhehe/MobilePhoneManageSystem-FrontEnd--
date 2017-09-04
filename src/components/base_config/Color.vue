@@ -68,6 +68,9 @@
         })
       },
       addColor() {
+        if(!this.addForm.name) {
+          return false
+        }
         let self = this
         let addColorUrl = `${backEndUrl}/color/add_color.do`
         axios.post(addColorUrl, JSON.stringify({

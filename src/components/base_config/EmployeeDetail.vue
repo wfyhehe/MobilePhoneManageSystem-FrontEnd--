@@ -26,7 +26,7 @@
         <el-input type="textarea" v-model="form.remark"></el-input>
       </el-form-item>
       <el-form-item label="系统账号">
-        <el-input v-model="form.username" :disabled="true"></el-input>
+        <el-input v-model="form.username" :readonly="true"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">确定</el-button>

@@ -2,7 +2,7 @@
   <div class="mobile-model-detail">
     <el-form :model="form" class="form" :rules="addRule" label-width="100px">
       <el-form-item label="手机型号编号" prop="id">
-        <el-input v-model="form.id" :disabled="true"></el-input>
+        <el-input v-model="form.id" :readonly="true"></el-input>
       </el-form-item>
       <el-form-item label="型号名" prop="name">
         <el-input v-model="form.name"></el-input>

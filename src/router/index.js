@@ -174,6 +174,13 @@ const AccountDetail = (resolve) => {
     resolve(module)
   })
 }
+
+const MobileInbound = (resolve) => {
+  import('@/components/supplier_business/MobileInbound').then((module) => {
+    resolve(module)
+  })
+}
+
 Vue.use(Router);
 
 export default new Router({
@@ -277,5 +284,8 @@ export default new Router({
       path: ':id',
       component: AccountDetail
     }]
+  }, {
+    path: '/mobile_inbound',
+    component: MobileInbound
   }]
 })

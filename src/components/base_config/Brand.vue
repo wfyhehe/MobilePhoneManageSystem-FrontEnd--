@@ -68,6 +68,9 @@
         })
       },
       addBrand() {
+        if(!this.addForm.name) {
+          return false
+        }
         let self = this
         let addBrandUrl = `${backEndUrl}/brand/add_brand.do`
         axios.post(addBrandUrl, JSON.stringify({

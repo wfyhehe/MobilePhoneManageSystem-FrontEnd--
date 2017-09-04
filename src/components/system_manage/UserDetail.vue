@@ -3,10 +3,10 @@
     <el-form ref="form" :model="form" class="form" label-width="80px">
       <h3>修改用户项</h3>
       <el-form-item label="用户名">
-        <el-input v-model="form.username" :disabled="true"></el-input>
+        <el-input v-model="form.username" :readonly="true"></el-input>
       </el-form-item>
       <el-form-item label="员工姓名">
-        <el-input v-model="form.empName" :disabled="true"></el-input>
+        <el-input v-model="form.empName" :readonly="true"></el-input>
         <el-button class="relate-emp" v-if="!form.employee"
         @click="relateEmp">关联员工账号</el-button>
       </el-form-item>

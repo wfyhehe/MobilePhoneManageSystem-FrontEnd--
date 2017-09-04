@@ -203,13 +203,15 @@
               <el-form-item>
                 <el-select v-model="addForm.rebatePriceForm.rebateType"
                            placeholder="返利类型"
+                           valueKey="id"
                            @visible-change="selectShowed">
                   <el-option v-for="(rebateType, i) in rebateTypes"
                              :value-key="rebateType.id"
                              :key="i"
                              :label="rebateType.name"
                              :disabled="isAdded(rebateType)"
-                             :value="JSON.stringify(rebateType)"></el-option>
+                             :value="rebateType"></el-option>
+                             <!--:value="JSON.stringify(rebateType)"></el-option>-->
                 </el-select>
               </el-form-item>
               <el-form-item prop="price">
@@ -505,7 +507,7 @@
           return false
         }
         let rebatePriceObj = JSON.parse(JSON.stringify(this.addForm.rebatePriceForm))
-        rebatePriceObj.rebateType = JSON.parse(rebatePriceObj.rebateType)
+//        rebatePriceObj.rebateType = JSON.parse(rebatePriceObj.rebateType)
         if (this.isAdded(rebatePriceObj.rebateType)) {
           return false
         }

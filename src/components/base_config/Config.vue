@@ -68,6 +68,9 @@
         })
       },
       addConfig() {
+        if(!this.addForm.name) {
+          return false
+        }
         let self = this
         let addConfigUrl = `${backEndUrl}/config/add_config.do`
         axios.post(addConfigUrl, JSON.stringify({
