@@ -1,7 +1,7 @@
 <template>
   <div class="mobile-inbound">
     <h3>手机入库</h3>
-    <el-button @click="test">test</el-button>
+    <!--<el-button @click="test">test</el-button>-->
     <el-form :model="form" class="form" :rules="addRule" label-width="100px">
       <el-form-item label="供应商类别">
         <el-select v-model="form.supplierType"
@@ -71,6 +71,9 @@
                      :value="color"></el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="参考价">
+        <el-input v-model="referencePrice" :readonly="true"></el-input>
+      </el-form-item>
       <el-form-item label="进货价" prop="buyPrice">
         <el-input v-model="form.buyPrice"></el-input>
       </el-form-item>
@@ -115,8 +118,8 @@
         } else if (!/^[0-9A-Z-]{1,15}$/.test(value)) {
           callback(new Error('编号必须由1-15位数字、大写字母、减号组成'))
         } else {
-          let checkMobileModelIdUrl = `${backEndUrl}/mobile_model/check_mobile_model.do`
-          axios.get(checkMobileModelIdUrl, {
+          let checkMobileInboundUrl = `${backEndUrl}/mobile_inbound/check_mobile_inbound.do`
+          axios.get(checkMobileInboundUrl, {
             params: {
               id: value
             }
@@ -186,6 +189,10 @@
     computed: {
       amount() {
         return this.form.quantity * this.form.buyPrice
+      },
+      referencePrice() {
+        let mobileModel = this.form.mobileModel
+        return mobileModel ? mobileModel.buyingPrice : 0
       }
     },
     methods: {
@@ -194,14 +201,11 @@
       },
       onSubmit() {
         let self = this
-        for (let rebatePrice of this.form.rebatePrices) {
-          rebatePrice.mobileModel = {id: this.$route.params.id}
-        }
         let updateMobileModelUrl = `${backEndUrl}/mobile_inbound/add_mobile_inbound.do`
         axios.post(updateMobileModelUrl, JSON.stringify({
           id: self.form.id,
           supplier: self.form.supplier,
-          model: self.form.model,
+          mobileModel: self.form.mobileModel,
           color: self.form.color,
           config: self.form.config,
           buyPrice: self.form.buyPrice,
@@ -220,7 +224,7 @@
           }
         }).then((response) => {
           if (response.data.status === SUCCESS) {
-            self.$message.success('修改成功')
+            self.$message.success('入库成功')
           } else {
             self.$message.error(response.data.msg)
           }

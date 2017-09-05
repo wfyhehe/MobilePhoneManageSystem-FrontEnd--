@@ -290,6 +290,8 @@
             self.suppliers = response.data.data
             self.count = response.data.count
             self.loading = false
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },

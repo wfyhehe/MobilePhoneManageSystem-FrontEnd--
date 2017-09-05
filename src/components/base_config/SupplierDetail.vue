@@ -47,7 +47,7 @@
     data() {
       return {
         form: {
-          id: '',
+          inputTime: 0,
           name: '',
           type: '',
           contact: '',
@@ -97,6 +97,8 @@
           if (response.data.status === SUCCESS) {
             self.types = response.data.data
             self.loading = false
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },

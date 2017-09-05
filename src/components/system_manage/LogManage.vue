@@ -166,6 +166,8 @@
               user.empName = user.employee ? user.employee.name : ''
             }
             self.loading = false
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -180,6 +182,8 @@
               user.empName = user.employee ? user.employee.name : ''
             }
             self.loading = false
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },

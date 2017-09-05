@@ -114,6 +114,8 @@
         if (response.data.status === SUCCESS) {
           self.menus = response.data.data
           self.loading = false
+        } else {
+          self.$message.error(response.data.msg)
         }
       })
     }

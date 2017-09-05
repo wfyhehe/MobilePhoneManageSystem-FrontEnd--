@@ -170,6 +170,8 @@
           if (response.data.status === SUCCESS) {
             self.supplierTypes = response.data.data
             self.loading = false
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },

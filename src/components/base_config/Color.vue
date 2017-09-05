@@ -64,6 +64,8 @@
           if (response.data.status === SUCCESS) {
             self.colors = response.data.data
             self.loading = false
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },

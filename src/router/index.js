@@ -181,6 +181,12 @@ const MobileInbound = (resolve) => {
   })
 }
 
+const InboundList = (resolve) => {
+  import('@/components/supplier_business/InboundList').then((module) => {
+    resolve(module)
+  })
+}
+
 Vue.use(Router);
 
 export default new Router({
@@ -287,5 +293,8 @@ export default new Router({
   }, {
     path: '/mobile_inbound',
     component: MobileInbound
+  }, {
+    path: '/inbound_list',
+    component: InboundList
   }]
 })
