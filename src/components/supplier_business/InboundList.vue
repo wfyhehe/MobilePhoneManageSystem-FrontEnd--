@@ -1,8 +1,6 @@
 <template>
   <div class="model-list-manage">
     <h2>入库单管理</h2>
-    {{this.searchForm.inputTime}}
-    {{+new Date('2017-09-05T12:44:56.270Z')}}
     <!--<el-button class="add" size="small" @click="turnToMobileInbound"><i class="el-icon-plus"></i> 转到入库界面</el-button>-->
     <div class="search">
       <el-form :inline="true" :model="searchForm">
@@ -15,12 +13,15 @@
             placeholder="选择时间范围">
           </el-date-picker>
         </el-form-item>
+        <el-button class="add" type="primary" @click="turnToMobileInbound">转到入库界面</el-button>
+        <br/>
         <el-form-item label="供应商类别">
           <el-select v-model="searchForm.supplierType"
                      placeholder="选择供应商类别"
                      valueKey="id"
                      @visible-change="getOptions"
                      @change="getSuppliers">
+            <el-option label="不限" value=""></el-option>
             <el-option v-for="supplierType in supplierTypes"
                        :key="supplierType.id"
                        :label="supplierType.name"
@@ -33,6 +34,7 @@
                      placeholder="请先选择供应商类别"
                      clearable
                      valueKey="id">
+            <el-option label="不限" value=""></el-option>
             <el-option v-for="supplier in suppliers"
                        :key="supplier.id"
                        :label="supplier.name"
@@ -45,6 +47,7 @@
                      valueKey="name"
                      @visible-change="getOptions"
                      @change="getMobileModels">
+            <el-option label="不限" value=""></el-option>
             <el-option v-for="brand in brands"
                        :key="brand.name"
                        :label="brand.name"
@@ -57,6 +60,7 @@
                      placeholder="请先选择品牌"
                      clearable
                      valueKey="id">
+            <el-option label="不限" value=""></el-option>
             <el-option v-for="mobileModel in mobileModels"
                        :key="mobileModel.id"
                        :label="mobileModel.name"
@@ -127,8 +131,6 @@
         <template scope="scope">
           <el-button :plain="true" type="info" icon="edit" size="small"
                      @click="editInboundList(scope.row)"></el-button>
-          <el-button :plain="true" type="danger" icon="delete" size="small"
-                     @click="deleteInboundList(scope.row)"></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -148,11 +150,15 @@
   import {backEndUrl, SUCCESS} from '@/common/config'
   import {debounce} from '@/common/util'
   import ElButton from "../../../node_modules/element-ui/packages/button/src/button.vue";
+  import ElOption from "../../../node_modules/element-ui/packages/select/src/option.vue";
 
   const PAGE_SIZE = 10
 
   export default {
-    components: {ElButton},
+    components: {
+      ElOption,
+      ElButton
+    },
     data() {
       return {
         pickerOptions: {
@@ -263,7 +269,6 @@
         })
       },
       getSuppliers(type) {
-        console.log(type)
         let self = this
         let supplierUrl = `${backEndUrl}/supplier/get_suppliers.do`
         axios.post(supplierUrl, {

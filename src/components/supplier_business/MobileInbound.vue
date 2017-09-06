@@ -42,7 +42,6 @@
         <!--选择品牌后才获取机型（为防止选项太多）-->
         <el-select v-model="form.mobileModel"
                    placeholder="请先选择品牌"
-                   ref="selectMobileModel"
                    clearable
                    valueKey="id">
           <el-option v-for="mobileModel in mobileModels"
@@ -77,8 +76,8 @@
       <el-form-item label="进货价" prop="buyPrice">
         <el-input v-model="form.buyPrice"></el-input>
       </el-form-item>
-      <el-form-item label="数量" prop="quantity">
-        <el-input v-model="form.quantity"></el-input>
+      <el-form-item label="数量">
+        <el-input v-model="quantity" :readonly="true"></el-input>
       </el-form-item>
       <el-form-item label="总价">
         <el-input v-model="amount" :readonly="true"></el-input>
@@ -89,9 +88,38 @@
       <el-form-item label="串号" prop="id">
         <el-input v-model="form.id"></el-input>
       </el-form-item>
+      <el-form-item label="已添加">
+        <div class="inline-table">
+          <el-form :inline="true"
+                   :rules="idRule"
+                   :model="form.addForm">
+            <el-form-item prop="id">
+              <el-input v-model="form.addForm.id"
+                        placeholder="串号"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button @click="addId">添加</el-button>
+            </el-form-item>
+          </el-form>
+          <el-table
+            :data="form.ids">
+            <el-table-column
+              prop="id"
+              label="串号">
+            </el-table-column>
+            <el-table-column label="操作">
+              <template scope="scope">
+                <el-button :plain="true" type="danger" icon="delete" size="small"
+                           @click="removeId(scope.row)"></el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">确定</el-button>
+        <el-button type="primary" @click="onSubmit">提交</el-button>
         <el-button @click="resetForm('form')">重置</el-button>
+        <el-button type="info" @click="turnToInboundList">查看入库单</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -114,23 +142,26 @@
     data() {
       let validateId = (rule, value, callback) => {
         if (!value) {
-          callback(new Error('请输入编号'))
+          callback(new Error('请输入串号'))
         } else if (!/^[0-9A-Z-]{1,15}$/.test(value)) {
           callback(new Error('编号必须由1-15位数字、大写字母、减号组成'))
+        } else if (this.isAdded(value)) {
+          callback(new Error('请勿重复添加'))
         } else {
-          let checkMobileInboundUrl = `${backEndUrl}/mobile_inbound/check_mobile_inbound.do`
-          axios.get(checkMobileInboundUrl, {
-            params: {
-              id: value
-            }
-          }).then((response) => {
-            if (response.data.status !== SUCCESS) {
-              // 编号已存在
-              callback(new Error(response.data.msg))
-            } else {
-              callback();
-            }
-          })
+          callback()
+//          let checkMobileInboundUrl = `${backEndUrl}/mobile_inbound/check_mobile_inbound.do`
+//          axios.get(checkMobileInboundUrl, {
+//            params: {
+//              id: value
+//            }
+//          }).then((response) => {
+//            if (response.data.status !== SUCCESS) {
+//              // 编号已存在
+//              callback(new Error(response.data.msg))
+//            } else {
+//              callback();
+//            }
+//          })
         }
       }
       let validateBuyPrice = (rule, value, callback) => {
@@ -143,19 +174,8 @@
           callback()
         }
       }
-      let validateQuantity = (rule, value, callback) => {
-        if (!value) {
-          callback(new Error('请输入数量'))
-        }
-        if (!/^\+?[1-9][0-9]*$/.test(value)) {
-          callback(new Error('请输入正整数'))
-        } else {
-          callback()
-        }
-      }
       return {
         form: {
-          id: '',
           supplierType: {},
           supplier: {},
           brand: {},
@@ -163,9 +183,12 @@
           config: {},
           color: {},
           buyPrice: 0,
-          quantity: 0,
           amount: 0,
-          remark: ''
+          remark: '',
+          ids: [],
+          addForm: {
+            id: ''
+          }
         },
         supplierTypes: [],
         suppliers: [],
@@ -174,21 +197,23 @@
         configs: [],
         colors: [],
         addRule: {
-          id: [
-            {validator: validateId, trigger: 'blur'}
-          ],
-          quantity: [
-            {validator: validateQuantity, trigger: 'blur'}
-          ],
           buyPrice: [
             {validator: validateBuyPrice, trigger: 'blur'}
+          ]
+        },
+        idRule: {
+          id: [
+            {validator: validateId, trigger: 'blur'}
           ]
         }
       }
     },
     computed: {
       amount() {
-        return this.form.quantity * this.form.buyPrice
+        return this.quantity * this.form.buyPrice
+      },
+      quantity() {
+        return this.form.ids.length
       },
       referencePrice() {
         let mobileModel = this.form.mobileModel
@@ -197,19 +222,18 @@
     },
     methods: {
       test() {
-        console.log(+new Date())
+        console.log(this.form)
       },
       onSubmit() {
         let self = this
         let updateMobileModelUrl = `${backEndUrl}/mobile_inbound/add_mobile_inbound.do`
         axios.post(updateMobileModelUrl, JSON.stringify({
-          id: self.form.id,
           supplier: self.form.supplier,
           mobileModel: self.form.mobileModel,
           color: self.form.color,
           config: self.form.config,
           buyPrice: self.form.buyPrice,
-          quantity: self.form.quantity,
+          quantity: self.quantity,
           amount: self.amount,
           inputTime: +new Date(),
           inputUser: null,
@@ -322,7 +346,35 @@
         this.getBrands()
         this.getConfigs()
         this.getColors()
-      }
+      },
+      turnToInboundList() {
+        this.$router.push('/inbound_list')
+      },
+      addId() {
+        if (!this.form.addForm.id) {
+          return false
+        }
+        let id = this.form.addForm.id
+        if (this.isAdded(id)) {
+          this.$message.error('该串号已经添加！')
+          return false
+        }
+        this.form.ids.push({id})
+        this.form.addForm.id = null
+      },
+      removeId(row) {
+        this.form.ids = this.form.ids.filter(obj => {
+          return obj.id !== row.id
+        })
+      },
+      isAdded(id) {
+        for (let obj of this.form.ids) {
+          if (obj.id === id) {
+            return true
+          }
+        }
+        return false
+      },
     },
     mounted() {
       this.getOptions()
@@ -344,6 +396,10 @@
   .form {
     margin: 100px;
     width: 50%;
+  }
+
+  .inline-table .el-table {
+    margin-top: 20px;
   }
 
   h1, h2, h3 {
