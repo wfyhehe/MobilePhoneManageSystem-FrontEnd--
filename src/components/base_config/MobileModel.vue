@@ -562,10 +562,6 @@
     margin-top: 20px;
   }
 
-  .el-table .deleted-row {
-    background-color: rgba(255, 73, 73, 0.56);
-  }
-
   .recover {
     float: right;
     margin: 10px 40px 10px 0;

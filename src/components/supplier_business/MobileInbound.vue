@@ -2,7 +2,7 @@
   <div class="mobile-inbound">
     <h3>手机入库</h3>
     <!--<el-button @click="test">test</el-button>-->
-    <el-form :model="form" class="form" :rules="addRule" label-width="100px">
+    <el-form :model="form" ref="form" :rules="addRule" label-width="100px">
       <el-form-item label="供应商类别">
         <el-select v-model="form.supplierType"
                    placeholder="选择供应商类别"
@@ -85,13 +85,11 @@
       <el-form-item label="备注">
         <el-input type="textarea" v-model="form.remark"></el-input>
       </el-form-item>
-      <el-form-item label="串号" prop="id">
-        <el-input v-model="form.id"></el-input>
-      </el-form-item>
-      <el-form-item label="已添加">
+      <el-form-item label="添加">
         <div class="inline-table">
           <el-form :inline="true"
                    :rules="idRule"
+                   ref="addForm"
                    :model="form.addForm">
             <el-form-item prop="id">
               <el-input v-model="form.addForm.id"
@@ -102,7 +100,7 @@
             </el-form-item>
           </el-form>
           <el-table
-            :data="form.ids">
+            :data="form.mobiles">
             <el-table-column
               prop="id"
               label="串号">
@@ -118,7 +116,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">提交</el-button>
-        <el-button @click="resetForm('form')">重置</el-button>
+        <el-button @click="resetForm">重置</el-button>
         <el-button type="info" @click="turnToInboundList">查看入库单</el-button>
       </el-form-item>
     </el-form>
@@ -185,7 +183,7 @@
           buyPrice: 0,
           amount: 0,
           remark: '',
-          ids: [],
+          mobiles: [],
           addForm: {
             id: ''
           }
@@ -213,7 +211,7 @@
         return this.quantity * this.form.buyPrice
       },
       quantity() {
-        return this.form.ids.length
+        return this.form.mobiles.length
       },
       referencePrice() {
         let mobileModel = this.form.mobileModel
@@ -241,7 +239,8 @@
           checkUser: null,
           checkStatus: null,
           dept: null,
-          remark: self.form.remark
+          remark: self.form.remark,
+          mobiles: self.form.mobiles
         }), {
           headers: {
             'Content-Type': 'application/json;charset=UTF-8'
@@ -249,13 +248,23 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             self.$message.success('入库成功')
+            self.resetForm()
           } else {
             self.$message.error(response.data.msg)
           }
         })
       },
-      resetForm(formName) {
-        this.$refs[formName].resetFields();
+      resetForm() {
+        this.$refs['form'].resetFields();
+        this.$refs['addForm'].resetFields();
+        this.form.mobiles = []
+        this.form.supplierType = {}
+        this.form.supplier = {}
+        this.form.brand = {}
+        this.form.mobileModel = {}
+        this.form.config = {}
+        this.form.color = {}
+        this.form.remark = ''
       },
       getSupplierTypes() {
         let self = this
@@ -359,16 +368,16 @@
           this.$message.error('该串号已经添加！')
           return false
         }
-        this.form.ids.push({id})
+        this.form.mobiles.push({id})
         this.form.addForm.id = null
       },
       removeId(row) {
-        this.form.ids = this.form.ids.filter(obj => {
+        this.form.mobiles = this.form.mobiles.filter(obj => {
           return obj.id !== row.id
         })
       },
       isAdded(id) {
-        for (let obj of this.form.ids) {
+        for (let obj of this.form.mobiles) {
           if (obj.id === id) {
             return true
           }

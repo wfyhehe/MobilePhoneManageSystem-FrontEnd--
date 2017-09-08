@@ -101,7 +101,7 @@
     top: 0;
     z-index: 1;
     background-color: aliceblue;
-    position: fixed;
+    position: absolute;
   }
 
   .form {

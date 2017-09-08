@@ -24,7 +24,7 @@
   }
 </script>
 
-<style scoped>
+<style>
   * {
     margin: 0;
     padding: 0;
@@ -36,5 +36,22 @@
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #2c3e50;
+  }
+
+  .el-table .row-unaudited {
+    background-color: rgba(126, 119, 130, 0.47);
+    /*background: #c9e5f5;*/
+  }
+
+  .el-table .row-passed {
+    background-color: rgba(131, 255, 131, 0.29);
+  }
+
+  .el-table .row-not-passed {
+    background-color: rgba(255, 73, 73, 0.29);
+  }
+
+  .el-table .deleted-row {
+    background-color: rgba(255, 73, 73, 0.34);
   }
 </style>

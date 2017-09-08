@@ -73,14 +73,15 @@
       :data="inboundList"
       style="width: 100%"
       align="left"
+      :row-class-name="tableRowClassName"
       :default-sort="{prop: 'id', order: 'ascending'}"
       v-loading.body="loading">
-      <el-table-column
-        class="column"
-        prop="id"
-        sortable
-        label="单据号码">
-      </el-table-column>
+      <!--<el-table-column-->
+      <!--class="column"-->
+      <!--prop="id"-->
+      <!--sortable-->
+      <!--label="单据号码">-->
+      <!--</el-table-column>-->
       <el-table-column
         prop="supplier.name"
         sortable
@@ -127,6 +128,7 @@
         prop="dept.name"
         label="部门">
       </el-table-column>
+      <!--TODO 审核按钮，以及编辑操作的detial（考虑将审核操作放在编辑里，有审核权限的人可以操作审核）-->
       <el-table-column label="操作">
         <template scope="scope">
           <el-button :plain="true" type="info" icon="edit" size="small"
@@ -313,37 +315,17 @@
           }
         })
       },
-      deleteInboundList(row) {
-        let self = this
-        let deleteUrl = `${backEndUrl}/mobile_inbound/delete_mobile_inbound.do`
-        this.$confirm('此操作将删除入库单, 是否继续？（可操作数据库进行恢复）', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          brand: 'danger'
-        }).then(() => {
-          axios.get(deleteUrl, {
-            params: {
-              id: row.id
-            }
-          }).then((response) => {
-            if (response.data.status === SUCCESS) {
-              self.getInboundLists()
-              self.$message({
-                brand: 'success',
-                message: '删除成功!'
-              })
-            } else {
-              self.$message({
-                brand: 'error',
-                message: response.data.msg
-              })
-            }
-          })
-        }).catch(() => {
-        })
-      },
       editInboundList(row) {
         this.$router.push(`/model_list/${row.id}`)
+      },
+      tableRowClassName(row) {
+        if (row.status === 'UNAUDITED') {
+          return 'row-unaudited'
+        } else if (row.status === 'PASSED') {
+          return 'row-passed'
+        } else if (row.status === 'NOT_PASSED') {
+          return 'row-not-passed'
+        }
       },
       getBrands() {
         let self = this
@@ -389,10 +371,6 @@
 
   .inline-table .el-table {
     margin-top: 20px;
-  }
-
-  .el-table .deleted-row {
-    background-color: rgba(255, 73, 73, 0.56);
   }
 
   .recover {

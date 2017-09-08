@@ -161,7 +161,9 @@
     },
     methods: {
       getUsers(index) {
-
+        if (index % 1 !== 0) {
+          index = null
+        }
         this.loading = true
         let self = this
         let searchUrl = `${backEndUrl}/user/get_users.do`
