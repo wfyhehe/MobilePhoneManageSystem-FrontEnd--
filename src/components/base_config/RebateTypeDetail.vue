@@ -71,6 +71,8 @@
           self.form.id = rebateType.id
           self.form.name = rebateType.name
           self.form.remark = rebateType.remark
+        } else {
+          self.$message.error(response.data.msg)
         }
       })
     }

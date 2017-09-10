@@ -81,7 +81,7 @@
           </el-table>
         </div>
       </el-form-item>
-      <el-form-item>
+      <el-form-item class="buttons">
         <el-button type="primary" @click="onSubmit">确定</el-button>
         <el-button @click="onCancel">取消</el-button>
       </el-form-item>
@@ -236,18 +236,21 @@
       }).then(response => {
         if (response.data.status === SUCCESS) {
           self.menu = response.data.data
-          console.log(self.menu)
 //          self.form = self.formatData(self.menu)
           self.form.name = self.menu.name
           self.form.path = self.menu.path
           self.form.remark = self.menu.remark
           self.form.roles = self.menu.roles
           self.form.actions = self.menu.actions
+        } else {
+          self.$message.error(response.data.msg)
         }
       })
       axios.get(getRolesUrl, {}).then(response => {
         if (response.data.status === SUCCESS) {
           self.allRoles = response.data.data
+        } else {
+          self.$message.error(response.data.msg)
         }
       })
     }

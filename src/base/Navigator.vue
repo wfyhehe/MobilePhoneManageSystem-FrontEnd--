@@ -85,6 +85,8 @@
             self.setUser(null)
             self.$router.push('/login')
             self.setUser({})
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -134,6 +136,7 @@
   }
 
   .title {
+    text-align: center;
     margin: 30px 10px;
     cursor: pointer;
     float: top;
@@ -143,6 +146,7 @@
   }
 
   .login-register-logout {
+    text-align: center;
     float: top;
     margin: 18px auto;
     cursor: pointer;

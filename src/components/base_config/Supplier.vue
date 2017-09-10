@@ -73,6 +73,7 @@
       <el-pagination
         layout="prev, pager, next"
         :total="count"
+        class="pagination"
         :current-page="pageIndex"
         :page-size="pageSize"
         @current-change="getSuppliers">
@@ -368,6 +369,8 @@
             self.getSuppliers()
             self.getDeletedSuppliers()
             self.$message.success('恢复成功')
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -382,6 +385,8 @@
           if (response.data.status === SUCCESS) {
             self.deletedSuppliers = response.data.data
             self.loadingDeleted = false
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -391,6 +396,8 @@
         axios.post(typeUrl, {}).then((response) => {
           if (response.data.status === SUCCESS) {
             self.types = response.data.data
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },

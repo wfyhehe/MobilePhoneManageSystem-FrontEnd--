@@ -80,6 +80,7 @@
       </el-table>
       <el-pagination
         layout="prev, pager, next"
+        class="pagination"
         :total="count"
         :current-page="pageIndex"
         :page-size="pageSize"

@@ -14,7 +14,7 @@
       <el-form-item label="验证码" prop="verificationCode">
         <el-input v-model="registerForm.verificationCode"></el-input>
       </el-form-item>
-      <el-form-item>
+      <el-form-item class="buttons">
         <el-button type="primary" @click="submitForm('registerForm')">提交</el-button>
         <el-button @click="resetForm('registerForm')">重置</el-button>
         <span class="v-code">

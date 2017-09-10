@@ -29,7 +29,7 @@
       <el-form-item label="备注">
         <el-input type="textarea" v-model="form.remark"></el-input>
       </el-form-item>
-      <el-form-item>
+      <el-form-item class="buttons">
         <el-button type="primary" @click="onSubmit">确定</el-button>
         <el-button @click="onCancel">取消</el-button>
       </el-form-item>
@@ -127,6 +127,8 @@
           self.form.email = supplier.email
           self.form.address = supplier.address
           self.form.remark = supplier.remark
+        } else {
+          self.$message.error(response.data.msg)
         }
       })
     }

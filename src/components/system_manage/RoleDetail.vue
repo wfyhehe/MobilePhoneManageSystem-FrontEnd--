@@ -11,7 +11,7 @@
       <el-form-item label="启用">
         <el-switch on-text="" off-text="" v-model="form.online"></el-switch>
       </el-form-item>
-      <el-form-item>
+      <el-form-item class="buttons">
         <el-button type="primary" @click="onSubmit">确定</el-button>
         <el-button @click="onCancel">取消</el-button>
       </el-form-item>

@@ -195,6 +195,8 @@
             self.getRoles()
             self.getDeletedRoles()
             self.$message.success('恢复成功')
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -209,6 +211,8 @@
           if (response.data.status === SUCCESS) {
             self.deletedRoles = response.data.data
             self.loadingDeleted = false
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },

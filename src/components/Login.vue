@@ -13,7 +13,7 @@
         <el-form-item label="验证码" prop="verificationCode">
           <el-input v-model="loginForm.verificationCode"></el-input>
         </el-form-item>
-        <el-form-item>
+        <el-form-item class="buttons">
           <el-button type="primary" @click="submitForm('loginForm')">提交</el-button>
           <el-button @click="register">注册</el-button>
           <span class="v-code">

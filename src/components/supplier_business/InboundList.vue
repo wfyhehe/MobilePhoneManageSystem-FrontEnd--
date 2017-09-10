@@ -139,6 +139,7 @@
     <el-pagination
       layout="prev, pager, next"
       :total="count"
+      class="pagination"
       :current-page="pageIndex"
       :page-size="pageSize"
       @current-change="getInboundLists">
@@ -267,6 +268,8 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             self.supplierTypes = response.data.data
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -283,6 +286,8 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             self.suppliers = response.data.data
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -296,6 +301,8 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             self.brands = response.data.data
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -312,6 +319,8 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             self.mobileModels = response.data.data
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -337,6 +346,8 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             self.brands = response.data.data
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },

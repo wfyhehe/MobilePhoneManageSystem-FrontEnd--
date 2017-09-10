@@ -56,6 +56,7 @@
       <el-pagination
         layout="prev, pager, next"
         :total="count"
+        class="pagination"
         :current-page="pageIndex"
         :page-size="pageSize"
         @current-change="getAccounts">
@@ -146,7 +147,6 @@
         }
       }
       let validateBalance = (rule, value, callback) => {
-        console.log(value)
         if (value) {
           if (!/^\d+(\.\d+)?$/.test(value)) {
             callback(new Error('请输入非负实数'))

@@ -87,6 +87,7 @@
       <el-pagination
         layout="prev, pager, next"
         :total="count"
+        class="pagination"
         :current-page="pageIndex"
         :page-size="pageSize"
         @current-change="getMobileModels">
@@ -461,6 +462,8 @@
             self.getMobileModels()
             self.getDeletedMobileModels()
             self.$message.success('恢复成功')
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -475,6 +478,8 @@
           if (response.data.status === SUCCESS) {
             self.deletedMobileModels = response.data.data
             self.loadingDeleted = false
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -488,6 +493,8 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             self.brands = response.data.data
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -501,6 +508,8 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             self.rebateTypes = response.data.data
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },

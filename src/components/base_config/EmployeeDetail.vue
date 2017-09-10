@@ -28,7 +28,7 @@
       <el-form-item label="系统账号">
         <el-input v-model="form.username" :readonly="true"></el-input>
       </el-form-item>
-      <el-form-item>
+      <el-form-item class="buttons">
         <el-button type="primary" @click="onSubmit">确定</el-button>
         <el-button @click="onCancel">取消</el-button>
       </el-form-item>

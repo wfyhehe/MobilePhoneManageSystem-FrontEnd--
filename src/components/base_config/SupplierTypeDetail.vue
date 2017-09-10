@@ -11,7 +11,7 @@
       <el-form-item label="备注" prop="remark">
         <el-input type="textarea" v-model="form.remark"></el-input>
       </el-form-item>
-      <el-form-item>
+      <el-form-item class="buttons">
         <el-button type="primary" @click="onSubmit">确定</el-button>
         <el-button @click="onCancel">取消</el-button>
       </el-form-item>
@@ -72,9 +72,11 @@
         if (response.data.status === SUCCESS) {
           let supplierType = response.data.data
           self.supplierType = supplierType
-          self.form.id = supplierType.id,
-            self.form.name = supplierType.name
+          self.form.id = supplierType.id
+          self.form.name = supplierType.name
           self.form.remark = supplierType.remark
+        } else {
+          self.$message.error(response.data.msg)
         }
       })
     }

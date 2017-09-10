@@ -34,9 +34,13 @@
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-align: center;
     color: #2c3e50;
   }
+
+  #app h1, h2, h3, .pagination, .buttons{
+    text-align: center;
+  }
+
 
   .el-table .row-unaudited {
     background-color: rgba(126, 119, 130, 0.47);

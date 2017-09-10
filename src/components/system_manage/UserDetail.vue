@@ -111,11 +111,15 @@
         if (response.data.status === SUCCESS) {
           self.user = response.data.data
           self.form = self.formatData(self.user)
+        } else {
+          self.$message.error(response.data.msg)
         }
       })
       axios.get(getRolesUrl, {}).then(response => {
         if (response.data.status === SUCCESS) {
           self.allRoles = response.data.data
+        } else {
+          self.$message.error(response.data.msg)
         }
       })
     }

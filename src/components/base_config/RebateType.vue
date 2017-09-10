@@ -199,6 +199,8 @@
             self.getRebateTypes()
             self.getDeletedRebateTypes()
             self.$message.success('恢复成功')
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -213,6 +215,8 @@
           if (response.data.status === SUCCESS) {
             self.deletedRebateTypes = response.data.data
             self.loadingDeleted = false
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="menu-manage" v-show="true">
+    <div class="menu-manage">
       <h2>菜单管理</h2>
       <el-button class="add" size="small" @click="addTop"><i class="el-icon-plus"></i> 添加顶级菜单</el-button>
       <el-table
@@ -117,6 +117,8 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             this.getMenus()
+          } else {
+            this.$message.error(response.data.msg)
           }
         })
 
@@ -133,6 +135,8 @@
         }).then(response => {
           if (response.data.status === SUCCESS) {
             this.getMenus()
+          } else {
+            this.$message.error(response.data.msg)
           }
         })
       },
@@ -145,6 +149,8 @@
         }).then(response => {
           if (response.data.status === SUCCESS) {
             this.getMenus()
+          } else {
+            this.$message.error(response.data.msg)
           }
         })
       },
@@ -164,6 +170,8 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             this.getMenus()
+          } else {
+            this.$message.error(response.data.msg)
           }
         })
       },

@@ -115,9 +115,11 @@
         </div>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">提交</el-button>
-        <el-button @click="resetForm">重置</el-button>
-        <el-button type="info" @click="turnToInboundList">查看入库单</el-button>
+        <div class="buttons">
+          <el-button type="primary" @click="onSubmit">提交</el-button>
+          <el-button @click="resetForm">重置</el-button>
+          <el-button type="info" @click="turnToInboundList">查看入库单</el-button>
+        </div>
       </el-form-item>
     </el-form>
   </div>
@@ -276,6 +278,8 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             self.supplierTypes = response.data.data
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -292,6 +296,8 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             self.suppliers = response.data.data
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -305,6 +311,8 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             self.brands = response.data.data
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -321,6 +329,8 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             self.mobileModels = response.data.data
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -334,6 +344,8 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             self.configs = response.data.data
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -347,6 +359,8 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             self.colors = response.data.data
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },

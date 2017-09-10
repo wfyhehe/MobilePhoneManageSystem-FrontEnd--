@@ -59,6 +59,7 @@
       </el-table>
       <el-pagination
         layout="prev, pager, next"
+        class="pagination"
         :total="count"
         :current-page="pageIndex"
         :page-size="pageSize"
@@ -233,6 +234,8 @@
             self.getUsers()
             self.getDeletedUsers()
             self.$message.success('恢复成功')
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -250,6 +253,8 @@
               user.empName = user.employee ? user.employee.name : ''
             }
             self.loadingDeleted = false
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },

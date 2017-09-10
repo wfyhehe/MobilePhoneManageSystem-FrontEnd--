@@ -132,6 +132,8 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             this.getDepts()
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -179,6 +181,8 @@
             self.getDepts()
             self.getDeletedDepts()
             self.$message.success('恢复成功')
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
@@ -193,6 +197,8 @@
           if (response.data.status === SUCCESS) {
             self.deletedDepts = response.data.data
             self.loadingDeleted = false
+          } else {
+            self.$message.error(response.data.msg)
           }
         })
       },
