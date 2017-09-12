@@ -8,11 +8,11 @@ export const SUCCESS = 0
  *
  * @param self: just input 'this'
  * @param success: a function which will execute when response.status === SUCCESS
- * @returns an object tokenModel:{ userId, token }
+ * @returns an object token:{ userId, token }
  */
 export function validateToken(self, success, fail) {
-  let tokenModel = getToken()
-  if(!tokenModel) {
+  let token = getToken()
+  if(!token) {
     if(fail) {
       fail()
     }
@@ -21,8 +21,7 @@ export function validateToken(self, success, fail) {
   let validateTokenUrl = `${backEndUrl}/user/validate_token.do`
   axios.get(validateTokenUrl, {
     params: {
-      userId: tokenModel.userId,
-      token: tokenModel.token
+      token
     }
   }).then((response) => {
     if (response && response.data.status !== SUCCESS) {
@@ -41,5 +40,5 @@ export function validateToken(self, success, fail) {
     }
     console.log(err)
   })
-  return tokenModel
+  return token
 }

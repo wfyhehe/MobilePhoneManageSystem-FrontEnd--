@@ -8,7 +8,7 @@
 <script>
   import {getToken, setToken} from '@/common/cache'
   import axios from 'axios'
-  import {backEndUrl, SUCCESS, validateToken} from '@/common/config'
+  import {backEndUrl, SUCCESS} from '@/common/config'
 
   export default {
     data() {

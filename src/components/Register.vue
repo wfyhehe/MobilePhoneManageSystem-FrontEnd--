@@ -157,21 +157,20 @@
                 }).then((response) => {
                   if (response.data.status === SUCCESS) {
                     // 用户名密码正确
-                    let tokenModel = response.data.data
-                    self.setTokenModel(tokenModel)
+                    let token = response.data.data
+//                    self.setToken(token)
                     axios.get(userInfoUrl, { // 获取用户信息
                       params: {
-                        userId: tokenModel.userId,
-                        token: tokenModel.token
+                        token
                       }
                     }).then((response) => {
                       if (response.data.status === SUCCESS) {
                         // 将用户信息存入local storage
                         setUserInfo(response.data.data)
-                        self.setUser(response.data.data)
+//                        self.setUser(response.data.data)
                       }
                     })
-                    setToken(tokenModel)
+                    setToken(token)
                     self.$router.push('/home')
                   } else {
                     // 账号或密码错误
@@ -191,10 +190,10 @@
           }
         })
       },
-      ...mapMutations({
-        setUser: 'SET_USER',
-        setTokenModel: 'SET_TOKEN_MODEL'
-      })
+//      ...mapMutations({
+//        setUser: 'SET_USER',
+//        setToken: 'SET_TOKEN'
+//      })
     }
   }
 </script>

@@ -1,5 +1,5 @@
 const state = {
-  tokenModel: {},
+  token: {},
   user: {},
   username: ''
 }

@@ -21,3 +21,5 @@ export function formatMoney(s, n) {
   }
   return t.split("").reverse().join("") + "." + r;
 }
+
+

@@ -1,7 +1,7 @@
 <template>
   <div class="auth-manage">
     <h2>权限管理</h2>
-    <!--<el-button @click="test">test</el-button>-->
+    <el-button @click="test">test</el-button>
     <el-select v-model="role"
                @change="getMenus"
                placeholder="请选择角色"
@@ -57,6 +57,14 @@
     },
     methods: {
       test() {
+        let obj = {}
+        console.log(JSON.stringify(obj))
+        if (JSON.stringify(obj === '{}')) {
+          console.log('ok1')
+        }
+        if (obj) {
+          console.log('ok2')
+        }
         let str = 'avvc#fewf#aaa'
         console.log(str.split('#')[0])
         console.log(this.authorized)

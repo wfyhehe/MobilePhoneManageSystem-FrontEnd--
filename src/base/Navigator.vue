@@ -33,23 +33,22 @@
 
 <script>
   import {mapGetters, mapMutations} from 'vuex'
-  import {getToken, getUserInfo, deleteToken, deleteUserInfo} from '@/common/cache'
+  import {getToken, getUserInfo, deleteToken, deleteUserInfo, TokenUtil} from '@/common/cache'
   import axios from 'axios'
-  import {backEndUrl, SUCCESS, validateToken} from '@/common/config'
+  import {backEndUrl, SUCCESS} from '@/common/config'
 
   export default {
     data() {
       return {
         menus: [],
+        user: {},
+        token: '',
         loading: true
       };
     },
     computed: {
       isLogin() {
-        for (let any in this.user) {
-          return true
-        }
-        return false
+        return JSON.stringify(this.user) !== '{}'
       },
       username() {
         if (this.user && this.user.username) {
@@ -58,10 +57,10 @@
           return ''
         }
       },
-      ...mapGetters([
-        'user',
-        'tokenModel'
-      ])
+//      ...mapGetters([
+//        'user',
+//        'token'
+//      ])
     },
     methods: {
       handleOpen(key, keyPath) {
@@ -75,41 +74,33 @@
         let self = this
         axios.get(logoutUrl, {
           params: {
-            userId: self.tokenModel.userId,
-            token: self.tokenModel.token
+            token: self.token
           }
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             deleteToken()
             deleteUserInfo()
-            self.setUser(null)
+//            self.setUser(null)
             self.$router.push('/login')
-            self.setUser({})
+//            self.setUser({})
           } else {
             self.$message.error(response.data.msg)
           }
         })
       },
-      ...mapMutations({
-        setUser: "SET_USER",
-        setTokenModel: "SET_TOKEN_MODEL"
-      })
+//      ...mapMutations({
+//        setUser: "SET_USER",
+//        setToken: "SET_TOKEN"
+//      })
     },
     mounted() {
       this.loading = true
       let menuUrl = `${backEndUrl}/menu/get_menus.do`
       let self = this
-      this.setUser(getUserInfo())
-      this.setTokenModel(getToken())
-      validateToken(this, () => {
-        },
-        () => {
-          self.setUser({})
-        })
-      let roles = []
-      if (this.user) {
-        roles = this.user.roles
-      }
+//      this.setUser(getUserInfo())
+//      this.setToken(getToken())
+      this.token = getToken()
+      TokenUtil.parseUserId(this.token)
       axios.get(menuUrl, {
         params: {}
       }).then((response) => {
