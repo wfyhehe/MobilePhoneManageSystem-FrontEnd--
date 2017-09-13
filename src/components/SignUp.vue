@@ -111,12 +111,11 @@
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.register()
+            this.signUp()
           } else {
             return false;
           }
         })
-        ;
       },
       resetForm(formName) {
         this.$refs[formName].resetFields();
@@ -124,64 +123,37 @@
       refreshImage() {
         this.$refs.vCode.src = `${backEndUrl}/util/v-code.do?${+new Date()}`
       },
-      register() {
-        let checkVCodeUrl = `${backEndUrl}/util/check_v-code.do`
-        let registerUrl = `${backEndUrl}/auth/sign_up.do`
-        let loginUrl = `${backEndUrl}/auth/sign_in.do`
+      signUp() {
+        let signUpUrl = `${backEndUrl}/auth/sign_up.do`
         let self = this
-        axios.get(checkVCodeUrl, {
-          params: {
-            vCode: self.registerForm.verificationCode
-          }
-        }).then(function (response) {
-//          if (response.data.status === SUCCESS) {
-          if (response.data.status !== SUCCESS) { // TODO 跨域问题不好调试，发布时用上面的
-            axios.post(registerUrl, {
+        axios.post(signUpUrl, {
+          user: {
+            username: self.registerForm.username,
+            password: self.registerForm.password
+          },
+          vCode: self.registerForm.verificationCode
+        }, {
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8'
+          },
+          withCredentials: true
+        }).then((response) => {
+          if (response.data.status === SUCCESS) {
+            this.setSignInInfo({
               username: self.registerForm.username,
               password: self.registerForm.password
-            }, {
-              headers: {
-                'Content-Type': 'application/json;charset=UTF-8'
-              }
-            }).then((response) => {
-              if (response.data.status === SUCCESS) {
-                // 登陆
-                axios.post(loginUrl, {
-                  username: self.registerForm.username,
-                  password: self.registerForm.password
-                }, {
-                  headers: {
-                    'Content-Type': 'application/json;charset=UTF-8'
-                  }
-                }).then((response) => {
-                  if (response.data.status === SUCCESS) {
-                    // 用户名密码正确
-                    let token = response.data.data
-//                    self.setToken(token)
-                    setToken(token)
-                    self.$router.push('/home')
-                  } else {
-                    // 账号或密码错误
-                    self.$message.error(response.data.msg)
-                    self.refreshImage()
-                  }
-                })
-                self.$message.success(response.data.msg)
-              } else {
-                self.$message.error(response.data.msg)
-              }
             })
+            self.$router.push('/sign_in')
+            self.$message.success('注册成功')
           } else {
-            // 验证码错误
             self.$message.error(response.data.msg)
-            self.refreshImage()
           }
         })
+
       },
-//      ...mapMutations({
-//        setUser: 'SET_USER',
-//        setToken: 'SET_TOKEN'
-//      })
+      ...mapMutations({
+        setSignInInfo: 'SET_SIGN_IN_INFO'
+      })
     }
   }
 </script>

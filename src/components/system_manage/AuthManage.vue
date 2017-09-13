@@ -1,7 +1,7 @@
 <template>
   <div class="auth-manage">
     <h2>权限管理</h2>
-    <el-button @click="test">test</el-button>
+    <!--<el-button @click="test">test</el-button>-->
     <el-select v-model="role"
                @change="getMenus"
                placeholder="请选择角色"

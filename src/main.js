@@ -32,17 +32,7 @@ axios.interceptors.request.use(config => {
 
 axios.interceptors.response.use(
   response => {
-    console.log(response)
-    // const data = response.data
-// 根据返回的code值来做不同的处理（和后端约定）
-
-    // 若不是正确的返回code，且已经登录，就抛出错误
-    // const error = new Error(data.description)
-
-    // error.data = data
-    // error.response = response
     return response
-    // throw error
   },
   error => {
     console.log(error.response)
@@ -52,13 +42,13 @@ axios.interceptors.response.use(
           error.message = '请求错误'
           break
         case 401:
-          error.message = '未授权，请登录'
+          error.message = '身份未验证，请先登录'
           console.log(store)
           store._mutations['SET_USERNAME'][0]('') // 别扭的vuex外界用法
           router.push('/sign_in')
           break
         case 403:
-          error.message = '拒绝访问'
+          error.message = '抱歉，您的权限不足！'
           break
         case 404:
           error.message = `请求地址出错: ${error.response.config.url}`

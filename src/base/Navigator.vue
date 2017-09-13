@@ -54,9 +54,6 @@
     },
     watch: {
       username(newVal, oldVal) {
-        console.log(oldVal)
-        console.log(newVal)
-        console.log(this)
         if (!oldVal && newVal) {
           this.getMenus()
         }

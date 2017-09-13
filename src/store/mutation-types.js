@@ -1,3 +1,3 @@
-export const SET_TOKEN = 'SET_TOKEN'
+export const SET_SIGN_IN_INFO = 'SET_SIGN_IN_INFO'
 
 export const SET_USERNAME = 'SET_USERNAME'

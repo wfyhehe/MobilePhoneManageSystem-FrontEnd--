@@ -2,7 +2,7 @@
   <div class="login">
     <div class="login-form">
       <h2>登录</h2>
-      <el-button @click="test">test</el-button>
+      <!--<el-button @click="test">test</el-button>-->
       <el-form :model="loginForm" :rules="loginRule" ref="loginForm"
                :label-position="labelPosition" label-width="100px">
         <el-form-item label="用户名" prop="username">
@@ -16,7 +16,7 @@
         </el-form-item>
         <el-form-item class="buttons">
           <el-button type="primary" @click="submitForm('loginForm')">提交</el-button>
-          <el-button @click="register">注册</el-button>
+          <el-button @click="signUp">注册</el-button>
           <span class="v-code">
             <img :src="verificationCodeUrl" ref="vCode" @click="refreshImage"/>
             <a href="javascript:void(0);" @click="refreshImage">看不清，换一张</a>
@@ -32,7 +32,7 @@
   import {backEndUrl, SUCCESS} from '@/common/config'
   import {setToken, TokenUtil, setLoginUser} from '@/common/cache'
   import CookieUtil from '@/common/cookie'
-  import {mapMutations} from 'vuex'
+  import {mapMutations, mapGetters} from 'vuex'
 
   export default {
     data() {
@@ -85,6 +85,11 @@
         verificationCodeUrl: `${backEndUrl}/util/v-code.do?${+new Date()}`
       }
     },
+    computed: {
+      ...mapGetters([
+        'signInInfo'
+      ])
+    },
     methods: {
       test() {
         console.log(CookieUtil.getCookie('vCodeId'))
@@ -92,7 +97,7 @@
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.login()
+            this.signIn()
           } else {
             return false
           }
@@ -104,7 +109,7 @@
       refreshImage() {
         this.$refs.vCode.src = `${backEndUrl}/util/v-code.do?${+new Date()}`
       },
-      login() {
+      signIn() {
         let loginUrl = `${backEndUrl}/auth/sign_in.do`
         let self = this
         axios.post(loginUrl, { // 验证用户名密码
@@ -145,7 +150,7 @@
           }
         })
       },
-      register() {
+      signUp() {
         this.$router.push('/sign_up')
       },
       ...mapMutations({
@@ -153,7 +158,10 @@
       })
     },
     mounted() {
-
+      if (this.signInInfo && this.signInInfo.username && this.signInInfo.password) {
+        this.loginForm.username = this.signInInfo.username
+        this.loginForm.password = this.signInInfo.password
+      }
     }
   }
 </script>

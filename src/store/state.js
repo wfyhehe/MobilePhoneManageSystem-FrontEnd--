@@ -1,5 +1,6 @@
 const state = {
-  username: ''
+  username: '',
+  signInInfo: {}
 }
 
 export default state
