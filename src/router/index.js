@@ -199,7 +199,7 @@ export default new Router({
     alias: '/',
     component: Home
   }, {
-    path: '/register',
+    path: '/sign_up',
     component: Register
   }, {
     path: '/404',

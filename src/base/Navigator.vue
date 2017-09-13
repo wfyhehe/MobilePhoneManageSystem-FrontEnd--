@@ -7,12 +7,12 @@
              :router="true"
              theme="dark">
       <router-link tag="p" to="/" class="title">手机进销存管理系统</router-link>
-      <div class="login-register-logout" v-show="!isLogin">
-        <router-link to="/login" tag="span">登录</router-link>
+      <div class="sign_in-sign_up-sign_out" v-show="!isSignIn">
+        <router-link to="/sign_in" tag="span">登录</router-link>
         <span>&nbsp;/&nbsp;</span>
-        <router-link to="/register" tag="span">注册</router-link>
+        <router-link to="/sign_up" tag="span">注册</router-link>
       </div>
-      <div class="login-register-logout" v-show="isLogin">
+      <div class="sign_in-sign_up-sign_out" v-show="isSignIn">
         <router-link to="/user_info" tag="span">{{username}}</router-link>
         <span>&nbsp;/&nbsp;</span>
         <span @click="logout">注销</span>
@@ -33,7 +33,7 @@
 
 <script>
   import {mapGetters, mapMutations} from 'vuex'
-  import {getToken, getUserInfo, deleteToken, deleteUserInfo, TokenUtil} from '@/common/cache'
+  import {getToken, deleteToken, TokenUtil, getLoginUser, setLoginUser} from '@/common/cache'
   import axios from 'axios'
   import {backEndUrl, SUCCESS} from '@/common/config'
 
@@ -44,11 +44,11 @@
         user: {},
         token: '',
         loading: true
-      };
+      }
     },
     computed: {
-      isLogin() {
-        return JSON.stringify(this.user) !== '{}'
+      isSignIn() {
+        return true
       },
       username() {
         if (this.user && this.user.username) {
@@ -64,10 +64,10 @@
     },
     methods: {
       handleOpen(key, keyPath) {
-        console.log(key, keyPath);
+        console.log(key, keyPath)
       },
       handleClose(key, keyPath) {
-        console.log(key, keyPath);
+        console.log(key, keyPath)
       },
       logout() {
         let logoutUrl = `${backEndUrl}/user/logout.do`
@@ -79,9 +79,8 @@
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             deleteToken()
-            deleteUserInfo()
 //            self.setUser(null)
-            self.$router.push('/login')
+            self.$router.push('/sign_in')
 //            self.setUser({})
           } else {
             self.$message.error(response.data.msg)
@@ -136,7 +135,7 @@
     font-family: 方正综艺简体;
   }
 
-  .login-register-logout {
+  .sign_in-sign_up-sign_out {
     text-align: center;
     float: top;
     margin: 18px auto;

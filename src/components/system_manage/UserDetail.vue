@@ -34,7 +34,7 @@
 <script>
   import axios from 'axios'
   import {backEndUrl, SUCCESS} from '@/common/config'
-  import ElFormItem from '../../../node_modules/element-ui/packages/form/src/form-item.vue';
+  import ElFormItem from '../../../node_modules/element-ui/packages/form/src/form-item.vue'
   import {mapMutations} from 'vuex'
 
   export default {

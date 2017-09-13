@@ -2,6 +2,7 @@
   <div class="login">
     <div class="login-form">
       <h2>登录</h2>
+      <el-button @click="test">test</el-button>
       <el-form :model="loginForm" :rules="loginRule" ref="loginForm"
                :label-position="labelPosition" label-width="100px">
         <el-form-item label="用户名" prop="username">
@@ -29,11 +30,11 @@
 <script>
   import axios from 'axios'
   import {backEndUrl, SUCCESS} from '@/common/config'
-  import {setToken, setUserInfo} from '@/common/cache'
+  import {setToken, TokenUtil} from '@/common/cache'
+  import CookieUtil from '@/common/cookie'
   import {mapMutations} from 'vuex'
 
   export default {
-    name: 'login',
     data() {
       let validateVerificationCode = (rule, value, callback) => {
         if (!value) {
@@ -85,6 +86,9 @@
       }
     },
     methods: {
+      test() {
+        console.log(CookieUtil.getCookie('vCodeId'))
+      },
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
@@ -101,67 +105,45 @@
         this.$refs.vCode.src = `${backEndUrl}/util/v-code.do?${+new Date()}`
       },
       login() {
-        let checkVCodeUrl = `${backEndUrl}/util/check_v-code.do`
-        let loginUrl = `${backEndUrl}/user/login.do`
+        let loginUrl = `${backEndUrl}/auth/sign_in.do`
         let userInfoUrl = `${backEndUrl}/user/get_user_info.do`
         let self = this
-        axios.get(checkVCodeUrl, { // 验证码
-          params: {
-            vCode: self.loginForm.verificationCode
-          }
-        }).then(function (response) {
-//          if (response.data.status === SUCCESS) {
-          if (response.data.status !== SUCCESS) { //TODO 验证码正确，跨域问题不好调试，发布时用上面的
-            axios.post(loginUrl, { // 验证用户名密码
-              username: self.loginForm.username,
-              password: self.loginForm.password
-            }, {
-              headers: {
-                'Content-Type': 'application/json;charset=UTF-8'
-              }
-            }).then((response) => {
-              if (response.data.status === SUCCESS) {
-                // 用户名密码正确
-                let token = response.data.data
-//                self.setToken(token)
-                axios.get(userInfoUrl, { // 获取用户信息
-                  params: {
-                    token
-                  }
-                }).then((response) => {
-                  if (response.data.status === SUCCESS) {
-                    // 将用户信息存入local storage
-                    setUserInfo(response.data.data)
-//                    self.setUser(response.data.data)
-                  }
-                })
-                setToken(token)
-                self.$router.push('/home')
-              } else {
-                // 账号或密码错误
-                self.$message.error(response.data.msg)
-                self.refreshImage()
-              }
-            })
+        axios.post(loginUrl, { // 验证用户名密码
+          username: self.loginForm.username,
+          password: self.loginForm.password,
+          vCode: self.loginForm.verificationCode
+        }, {
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8'
+          },
+          withCredentials: true
+        }).then((response) => {
+          console.log(response)
+          if (response.data.status === SUCCESS) {
+            let token = response.data.data
+            setToken(TokenUtil.stringifyToken(token))
+
+            self.$message.success('登陆成功')
+            self.$router.push('/home')
           } else {
-            // 验证码错误
             self.$message.error(response.data.msg)
             self.refreshImage()
           }
         })
       },
-      register() {
-        this.$router.push('/register')
+      getUser(){
+        
       },
-//      ...mapMutations({
-//        setUser: 'SET_USER',
-//        setToken: 'SET_TOKEN'
-//      })
+      register() {
+        this.$router.push('/sign_up')
+      },
+      ...mapMutations({
+        setUser: 'SET_USER'
+      })
     },
     mounted() {
 
     }
-
   }
 </script>
 

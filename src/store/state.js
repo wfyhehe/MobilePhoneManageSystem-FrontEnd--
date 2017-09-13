@@ -1,7 +1,5 @@
 const state = {
-  token: {},
-  user: {},
-  username: ''
+  user: {}
 }
 
 export default state

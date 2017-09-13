@@ -1,9 +1,15 @@
+import CookieUtil from '@/common/cookie'
+
 const TOKEN = '__token__'
 
 const USER = '__user__'
 
-export function setToken(tokenModel) {
-  localStorage.setItem(TOKEN, tokenModel)
+const LOGIN_USER = '__loginUser__'
+
+const TOKEN_SEPARATOR = '#'
+
+export function setToken(token) {
+  localStorage.setItem(TOKEN, token)
 }
 
 export function getToken() {
@@ -14,18 +20,39 @@ export function TokenUtil() {
 }
 
 TokenUtil.parseUserId = (token) => {
-  return token.split('#')[0]
+  if(!token) {
+    return ''
+  }
+  return token.split(TOKEN_SEPARATOR)[0]
 }
 
 TokenUtil.parseUuid = (token) => {
-  return token.split('#')[1]
+  if(!token) {
+    return ''
+  }
+  return token.split(TOKEN_SEPARATOR)[1]
+}
+
+TokenUtil.stringifyToken = (token) => {
+  if (token && token['userId'] && token['credentials']) {
+    return token['userId'] + TOKEN_SEPARATOR + token['credentials']
+  }
+  return ''
 }
 
 export function deleteToken() {
   localStorage.removeItem(TOKEN)
 }
 
-export function setUserInfo(userInfo) {
+export function getLoginUser() {
+  return CookieUtil.getCookie(LOGIN_USER)
+}
+
+export function setLoginUser(username) {
+  CookieUtil.setCookie(LOGIN_USER, username)
+}
+
+/*export function setUserInfo(userInfo) {
   localStorage.setItem(USER, JSON.stringify(userInfo))
 }
 
@@ -35,4 +62,4 @@ export function getUserInfo() {
 
 export function deleteUserInfo() {
   localStorage.removeItem(USER)
-}
+}*/

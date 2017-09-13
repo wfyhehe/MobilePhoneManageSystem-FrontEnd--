@@ -18,13 +18,11 @@ Vue.config.productionTip = false
 axios.interceptors.request.use(config => {
   //在请求发出之前进行一些操作
   let token = getToken()
-  console.log(token)
   if (token) {  // 判断是否存在token，如果存在的话，则每个http header都加上token
-    config.headers.Authorization = `Bearer ${token}`
+    config.headers.Authorization = token
 
     // config.headers.Authentication = token
   }
-  console.log(config)
   return config
 }, error => {
   console.log(error)
@@ -35,19 +33,18 @@ axios.interceptors.request.use(config => {
 axios.interceptors.response.use(
   response => {
     console.log(response)
-    const data = response.data
+    // const data = response.data
 // 根据返回的code值来做不同的处理（和后端约定）
 
     // 若不是正确的返回code，且已经登录，就抛出错误
-    const error = new Error(data.description)
+    // const error = new Error(data.description)
 
-    error.data = data
-    error.response = response
-
+    // error.data = data
+    // error.response = response
+    return response
     // throw error
   },
   error => {
-    console.log(error)
     console.log(error.response)
     if (error && error.response) {
       switch (error.response.status) {
@@ -56,6 +53,7 @@ axios.interceptors.response.use(
           break
         case 401:
           error.message = '未授权，请登录'
+          router.push('/login')
           break
         case 403:
           error.message = '拒绝访问'
@@ -87,7 +85,7 @@ axios.interceptors.response.use(
         default:
       }
     }
-    // router.push('/login')
+    ElementUI.Message.error(error.message)
     return Promise.reject(error.message)
   })
 

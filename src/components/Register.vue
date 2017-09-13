@@ -28,7 +28,7 @@
 
 <script>
   import axios from 'axios'
-  import {setToken, setUserInfo} from '@/common/cache'
+  import {setToken} from '@/common/cache'
   import {mapMutations} from 'vuex'
   import {backEndUrl, SUCCESS} from '@/common/config'
 
@@ -126,9 +126,8 @@
       },
       register() {
         let checkVCodeUrl = `${backEndUrl}/util/check_v-code.do`
-        let registerUrl = `${backEndUrl}/user/register.do`
-        let loginUrl = `${backEndUrl}/user/login.do`
-        let userInfoUrl = `${backEndUrl}/user/get_user_info.do`
+        let registerUrl = `${backEndUrl}/auth/sign_up.do`
+        let loginUrl = `${backEndUrl}/auth/sign_in.do`
         let self = this
         axios.get(checkVCodeUrl, {
           params: {
@@ -159,17 +158,6 @@
                     // 用户名密码正确
                     let token = response.data.data
 //                    self.setToken(token)
-                    axios.get(userInfoUrl, { // 获取用户信息
-                      params: {
-                        token
-                      }
-                    }).then((response) => {
-                      if (response.data.status === SUCCESS) {
-                        // 将用户信息存入local storage
-                        setUserInfo(response.data.data)
-//                        self.setUser(response.data.data)
-                      }
-                    })
                     setToken(token)
                     self.$router.push('/home')
                   } else {
