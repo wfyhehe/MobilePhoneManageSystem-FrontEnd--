@@ -15,7 +15,7 @@
       <div class="sign_in-sign_up-sign_out" v-show="isSignIn">
         <router-link to="/user_info" tag="span">{{username}}</router-link>
         <span>&nbsp;/&nbsp;</span>
-        <span @click="logout">注销</span>
+        <span @click="signOut">注销</span>
       </div>
       <el-submenu :index="menu.name || ''" v-for="(menu, i) in menus" :key="i"
                   v-loading.body="loading">
@@ -41,26 +41,26 @@
     data() {
       return {
         menus: [],
-        user: {},
-        token: '',
         loading: true
       }
     },
     computed: {
       isSignIn() {
-        return true
+        return this.username
       },
-      username() {
-        if (this.user && this.user.username) {
-          return this.user.username
-        } else {
-          return ''
+      ...mapGetters([
+        'username'
+      ])
+    },
+    watch: {
+      username(newVal, oldVal) {
+        console.log(oldVal)
+        console.log(newVal)
+        console.log(this)
+        if (!oldVal && newVal) {
+          this.getMenus()
         }
-      },
-//      ...mapGetters([
-//        'user',
-//        'token'
-//      ])
+      }
     },
     methods: {
       handleOpen(key, keyPath) {
@@ -69,47 +69,43 @@
       handleClose(key, keyPath) {
         console.log(key, keyPath)
       },
-      logout() {
-        let logoutUrl = `${backEndUrl}/user/logout.do`
+      signOut() {
+        let signOutUrl = `${backEndUrl}/auth/sign_out.do`
         let self = this
-        axios.get(logoutUrl, {
-          params: {
-            token: self.token
-          }
+        axios.get(signOutUrl, {
+          params: {}
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             deleteToken()
-//            self.setUser(null)
+            self.setUsername(null)
             self.$router.push('/sign_in')
-//            self.setUser({})
           } else {
             self.$message.error(response.data.msg)
           }
         })
       },
-//      ...mapMutations({
-//        setUser: "SET_USER",
-//        setToken: "SET_TOKEN"
-//      })
+      getMenus() {
+        this.loading = true
+        let menuUrl = `${backEndUrl}/menu/get_menus.do`
+        let self = this
+        axios.get(menuUrl, {
+          params: {}
+        }).then((response) => {
+          if (response.data.status === SUCCESS) {
+            self.menus = response.data.data
+            self.loading = false
+          } else {
+            self.$message.error(response.data.msg)
+          }
+        })
+      },
+      ...mapMutations({
+        setUsername: "SET_USERNAME"
+      })
     },
     mounted() {
-      this.loading = true
-      let menuUrl = `${backEndUrl}/menu/get_menus.do`
-      let self = this
-//      this.setUser(getUserInfo())
-//      this.setToken(getToken())
-      this.token = getToken()
-      TokenUtil.parseUserId(this.token)
-      axios.get(menuUrl, {
-        params: {}
-      }).then((response) => {
-        if (response.data.status === SUCCESS) {
-          self.menus = response.data.data
-          self.loading = false
-        } else {
-          self.$message.error(response.data.msg)
-        }
-      })
+      this.setUsername(getLoginUser())
+      this.getMenus()
     }
   }
 </script>

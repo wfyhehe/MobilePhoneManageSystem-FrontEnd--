@@ -20,14 +20,14 @@ export function TokenUtil() {
 }
 
 TokenUtil.parseUserId = (token) => {
-  if(!token) {
+  if (!token) {
     return ''
   }
   return token.split(TOKEN_SEPARATOR)[0]
 }
 
 TokenUtil.parseUuid = (token) => {
-  if(!token) {
+  if (!token) {
     return ''
   }
   return token.split(TOKEN_SEPARATOR)[1]

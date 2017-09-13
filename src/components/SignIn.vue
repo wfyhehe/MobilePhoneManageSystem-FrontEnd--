@@ -30,7 +30,7 @@
 <script>
   import axios from 'axios'
   import {backEndUrl, SUCCESS} from '@/common/config'
-  import {setToken, TokenUtil} from '@/common/cache'
+  import {setToken, TokenUtil, setLoginUser} from '@/common/cache'
   import CookieUtil from '@/common/cookie'
   import {mapMutations} from 'vuex'
 
@@ -106,7 +106,6 @@
       },
       login() {
         let loginUrl = `${backEndUrl}/auth/sign_in.do`
-        let userInfoUrl = `${backEndUrl}/user/get_user_info.do`
         let self = this
         axios.post(loginUrl, { // 验证用户名密码
           username: self.loginForm.username,
@@ -122,7 +121,7 @@
           if (response.data.status === SUCCESS) {
             let token = response.data.data
             setToken(TokenUtil.stringifyToken(token))
-
+            self.getMe()
             self.$message.success('登陆成功')
             self.$router.push('/home')
           } else {
@@ -131,14 +130,26 @@
           }
         })
       },
-      getUser(){
-        
+      getMe() {
+        let userInfoUrl = `${backEndUrl}/user/get_me.do`
+        let self = this
+        axios.get(userInfoUrl, {
+          params: {}
+        }).then((response) => {
+          if (response.data.status === SUCCESS) {
+            let user = response.data.data
+            self.setUsername(user.username)
+            setLoginUser(user.username)
+          } else {
+            self.$message.error(response.data.msg)
+          }
+        })
       },
       register() {
         this.$router.push('/sign_up')
       },
       ...mapMutations({
-        setUser: 'SET_USER'
+        setUsername: 'SET_USERNAME'
       })
     },
     mounted() {

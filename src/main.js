@@ -53,7 +53,9 @@ axios.interceptors.response.use(
           break
         case 401:
           error.message = '未授权，请登录'
-          router.push('/login')
+          console.log(store)
+          store._mutations['SET_USERNAME'][0]('') // 别扭的vuex外界用法
+          router.push('/sign_in')
           break
         case 403:
           error.message = '拒绝访问'
@@ -88,7 +90,6 @@ axios.interceptors.response.use(
     ElementUI.Message.error(error.message)
     return Promise.reject(error.message)
   })
-
 
 
 /* eslint-disable no-new */

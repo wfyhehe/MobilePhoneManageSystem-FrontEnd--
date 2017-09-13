@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-const Login = (resolve) => {
-  import('@/components/Login').then((module) => {
+const SignIn = (resolve) => {
+  import('@/components/SignIn').then((module) => {
     resolve(module)
   })
 }
@@ -13,8 +13,8 @@ const Home = (resolve) => {
   })
 }
 
-const Register = (resolve) => {
-  import('@/components/Register').then((module) => {
+const SignUp = (resolve) => {
+  import('@/components/SignUp').then((module) => {
     resolve(module)
   })
 }
@@ -192,15 +192,15 @@ Vue.use(Router);
 export default new Router({
   mode: "history",
   routes: [{
-    path: '/login',
-    component: Login
+    path: '/sign_in',
+    component: SignIn
   }, {
     path: '/home',
     alias: '/',
     component: Home
   }, {
     path: '/sign_up',
-    component: Register
+    component: SignUp
   }, {
     path: '/404',
     alias: '*',
