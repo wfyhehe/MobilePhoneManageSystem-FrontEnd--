@@ -1,7 +1,6 @@
 <template>
   <div class="home">
     <h1>Home</h1>
-    <!--TODO 权限管理（大工程）-->
   </div>
 </template>
 

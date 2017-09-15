@@ -1,116 +1,76 @@
 <template>
-  <div>
-    <!--TODO 日志管理-->
-    <div class="user-manage" v-if="false">
-      <h2>用户管理</h2>
-      <div class="search">
-        <el-form :inline="true" :model="searchForm">
-          <el-form-item label="用户名">
-            <el-input v-model="searchForm.username" placeholder="用户名"></el-input>
-          </el-form-item>
-          <el-form-item label="员工姓名">
-            <el-input v-model="searchForm.empName" placeholder="员工姓名"></el-input>
-          </el-form-item>
-        </el-form>
-      </div>
-      <el-table
-        :data="users"
-        style="width: 100%"
-        align="left"
-        :default-sort="{prop: 'lastLoginTime', order: 'descending'}"
-        v-loading.body="loading">
-        <el-table-column
-          class="column"
-          prop="username"
-          sortable
-          label="用户名">
-        </el-table-column>
-        <el-table-column
-          prop="empName"
-          label="员工姓名">
-        </el-table-column>
-        <el-table-column
-          prop="remark"
-          label="备注">
-        </el-table-column>
-        <el-table-column
-          prop="createTime"
-          sortable
-          label="创建时间">
-        </el-table-column>
-        <el-table-column
-          prop="lastLoginTime"
-          sortable
-          label="上次登录时间">
-        </el-table-column>
-        <el-table-column
-          label="角色">
-          <template scope="scope">
-            <span v-for="role in scope.row.roles">{{role.name}},&nbsp;</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作">
-          <template scope="scope">
-            <el-button :plain="true" type="info" icon="edit" size="small"
-                       @click="editUser(scope.row)"></el-button>
-            <el-button :plain="true" type="danger" icon="delete" size="small"
-                       @click="deleteUser(scope.row)"></el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <div class="recover">
-        <el-button @click="getDeletedUsers" :plain="true" v-show="!showDeleted" type="info">显示已删除用户</el-button>
-        <el-button @click="hideRecover" :plain="true" v-show="showDeleted" type="info">隐藏已删除用户</el-button>
-      </div>
-      <el-table
-        v-if="showDeleted"
-        class="form2"
-        :data="deletedUsers"
-        row-class-name="deleted-row"
-        style="width: 100%"
-        align="left"
-        :default-sort="{prop: 'createTime', order: 'descending'}"
-        v-loading.body="loadingDeleted">
-        <el-table-column
-          class="column"
-          prop="username"
-          sortable
-          label="用户名">
-        </el-table-column>
-        <el-table-column
-          prop="empName"
-          label="员工姓名">
-        </el-table-column>
-        <el-table-column
-          prop="remark"
-          label="备注">
-        </el-table-column>
-        <el-table-column
-          prop="createTime"
-          sortable
-          label="创建时间">
-        </el-table-column>
-        <el-table-column
-          prop="lastLoginTime"
-          sortable
-          label="上次登录时间">
-        </el-table-column>
-        <el-table-column
-          label="角色">
-          <template scope="scope">
-            <span v-for="role in scope.row.roles">{{role.name}},&nbsp;</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作">
-          <template scope="scope">
-            <el-button
-              size="small"
-              @click="recoverUser(scope.row)">恢复
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+  <div class="model-list-manage">
+    <h2>日志管理</h2>
+    <div class="search">
+      <el-form :inline="true" :model="searchForm">
+        <el-form-item label="日志时间范围">
+          <el-date-picker
+            v-model="searchForm.createDate"
+            format="yyyy-MM-dd HH-mm-ss"
+            type="datetimerange"
+            :picker-options="pickerOptions"
+            placeholder="选择时间范围">
+          </el-date-picker>
+        </el-form-item>
+        <br/>
+        <el-form-item label="动作地址">
+          <el-input v-model="searchForm.actionUrl" placeholder="动作地址"></el-input>
+        </el-form-item>
+        <el-form-item label="用户名">
+          <el-input v-model="searchForm.username" placeholder="用户名"></el-input>
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-checkbox-group v-model="searchForm.status">
+            <el-checkbox label="ACCEPTED" value="ACCEPTED">通过</el-checkbox>
+            <el-checkbox label="UNAUTHENTICATED" value="UNAUTHENTICATED">未登录</el-checkbox>
+            <el-checkbox label="UNAUTHORIZED" value="UNAUTHORIZED">无权限</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+      </el-form>
     </div>
+    <el-table
+      :data="logs"
+      style="width: 100%"
+      align="left"
+      :row-class-name="tableRowClassName"
+      :default-sort="{prop: 'sortable', order: 'descending'}"
+      v-loading.body="loading">
+      <el-table-column
+        prop="action.url"
+        sortable
+        label="动作地址">
+      </el-table-column>
+      <el-table-column
+        prop="user.username"
+        sortable
+        label="用户">
+      </el-table-column>
+      <el-table-column
+        prop="createDate"
+        sortable
+        label="时间">
+      </el-table-column>
+      <el-table-column
+        prop="ip"
+        label="IP">
+      </el-table-column>
+      <el-table-column
+        prop="remark"
+        label="备注">
+      </el-table-column>
+      <el-table-column
+        prop="status"
+        label="状态">
+      </el-table-column>
+    </el-table>
+    <el-pagination
+      layout="prev, pager, next"
+      :total="count"
+      class="pagination"
+      :current-page="pageIndex"
+      :page-size="pageSize"
+      @current-change="getLogs">
+    </el-pagination>
     <router-view></router-view>
   </div>
 </template>
@@ -119,19 +79,64 @@
   import axios from 'axios'
   import {backEndUrl, SUCCESS} from '@/common/config'
   import {debounce} from '@/common/util'
+  import ElButton from "../../../node_modules/element-ui/packages/button/src/button.vue"
+  import ElOption from "../../../node_modules/element-ui/packages/select/src/option.vue"
+
+  const PAGE_SIZE = 10
 
   export default {
+    components: {
+      ElOption,
+      ElButton
+    },
     data() {
       return {
-        searchForm: {
-          name: '',
-          username: ''
+        pickerOptions: {
+          shortcuts: [{
+            text: '最近一天',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24)
+              picker.$emit('pick', [start, end])
+            }
+          }, {
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+              picker.$emit('pick', [start, end])
+            }
+          }, {
+            text: '最近一个月',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+              picker.$emit('pick', [start, end])
+            }
+          }, {
+            text: '最近三个月',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+              picker.$emit('pick', [start, end])
+            }
+          }]
         },
-        users: [],
-        deletedUsers: [],
+        searchForm: {
+          createDate: '',
+          actionUrl: '',
+          username: '',
+          status: []
+        },
+        logs: [],
         loading: true,
-        loadingDeleted: true,
-        showDeleted: false
+        pageIndex: 1,
+        pageSize: PAGE_SIZE,
+        count: 0
       }
     },
     computed: {
@@ -141,148 +146,82 @@
     },
     watch: {
       // 如果路由有变化，会再次执行该方法
-      '$route': 'getUsers',
-
-      // 搜索表单出现变化后经过500ms自动向后端发送搜索请求
       searchFormJson: debounce(function () {
-        this.search()
-      }, 500)
+        this.getLogs()
+      }, 500),
+      '$route': 'getLogs'
     },
     methods: {
-      search() {
+      getLogs(index) {
+        if (index % 1 !== 0) {
+          index = null
+        }
         this.loading = true
         let self = this
-        let searchUrl = `${backEndUrl}/user/get_users.do`
+        let searchUrl = `${backEndUrl}/log/get_logs.do`
         axios.post(searchUrl, JSON.stringify({
-          name: this.searchForm.name,
-          username: this.searchForm.username
+          actionUrl: self.searchForm.actionUrl,
+          username: self.searchForm.username,
+          startTime: self.searchForm.inputTime ? +new Date(self.searchForm.inputTime[0]) : null,
+          endTime: self.searchForm.inputTime ? +new Date(self.searchForm.inputTime[1]) : null,
+          status: self.searchForm.status,
+          pageIndex: index || self.pageIndex,
+          pageSize: PAGE_SIZE
         }), {
           headers: {
             'Content-Type': 'application/json;charset=UTF-8'
           }
         }).then((response) => {
           if (response.data.status === SUCCESS) {
-            self.users = response.data.data
-            for (let user of self.users) {
-              user.empName = user.employee ? user.employee.name : ''
-            }
+            self.logs = response.data.data
+            self.count = response.data.count
             self.loading = false
           } else {
             self.$message.error(response.data.msg)
           }
         })
       },
-      getUsers() {
-        this.loading = true
-        let self = this
-        let userUrl = `${backEndUrl}/user/get_users.do`
-        axios.post(userUrl, {}).then((response) => {
-          if (response.data.status === SUCCESS) {
-            self.users = response.data.data
-            for (let user of self.users) {
-              user.empName = user.employee ? user.employee.name : ''
-            }
-            self.loading = false
-          } else {
-            self.$message.error(response.data.msg)
-          }
-        })
-      },
-      deleteUser(row) {
-        let self = this
-        let deleteUrl = `${backEndUrl}/user/delete_user.do`
-        this.$confirm('此操作将删除用户, 是否继续？（可操作数据库进行恢复）', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'danger'
-        }).then(() => {
-          axios.get(deleteUrl, {
-            params: {
-              id: row.id
-            }
-          }).then((response) => {
-            if (response.data.status === SUCCESS) {
-              self.getUsers()
-              self.$message({
-                type: 'success',
-                message: '删除成功!'
-              })
-            } else {
-              self.$message({
-                type: 'error',
-                message: response.data.msg
-              })
-            }
-          })
-        }).catch(() => {
-        })
-      },
-      editUser(row) {
-        this.$router.push(`/user_manage/${row.id}`)
-      },
-      recoverUser(row) {
-        let self = this
-        let recoverUserUrl = `${backEndUrl}/user/recover_user.do`
-        axios.get(recoverUserUrl, {
-          params: {
-            id: row.id
-          }
-        }).then((response) => {
-          if (response.data.status === SUCCESS) {
-            self.getUsers()
-            self.getDeletedUsers()
-            self.$message.success('恢复成功')
-          } else {
-            self.$message.error(response.data.msg)
-          }
-        })
-      },
-      getDeletedUsers() {
-        this.showDeleted = true
-        this.loadingDeleted = true
-        let self = this
-        let deletedUserUrl = `${backEndUrl}/user/get_deleted_users.do`
-        axios.get(deletedUserUrl, {
-          params: {}
-        }).then((response) => {
-          if (response.data.status === SUCCESS) {
-            self.deletedUsers = response.data.data
-            for (let user of self.deletedUsers) {
-              user.empName = user.employee ? user.employee.name : ''
-            }
-            self.loadingDeleted = false
-          } else {
-            self.$message.error(response.data.msg)
-          }
-        })
-      },
-      hideRecover() {
-        this.showDeleted = false
-        this.loadingDeleted = false
+      tableRowClassName(row) {
+        if (row.status === 'UNAUTHENTICATED') {
+          return 'row-unaudited'
+        } else if (row.status === 'ACCEPTED') {
+          return 'row-passed'
+        } else if (row.status === 'UNAUTHORIZED') {
+          return 'row-not-passed'
+        }
       }
     },
     mounted() {
-      this.getUsers()
+      this.getLogs()
     }
   }
 </script>
 
 <style scoped>
 
-  .user-manage {
+  .model-list-manage {
   }
 
   .form2 {
     margin: 100px 0;
   }
 
-  .el-table .deleted-row {
-    background-color: rgba(255, 73, 73, 0.56);
+  .inline-table * {
+    float: left;
+  }
+
+  .inline-table .el-table {
+    margin-top: 20px;
   }
 
   .recover {
     float: right;
     margin: 10px 40px 10px 0;
+  }
+
+  .add {
+    float: left;
+    margin: 10px 40px 10px 10px;
   }
 
   h1, h2, h3 {

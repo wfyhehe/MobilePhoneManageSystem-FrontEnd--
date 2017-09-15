@@ -1,6 +1,7 @@
 <template>
   <div class="model-list-manage">
     <h2>入库单管理</h2>
+    <!--<h2 v-for="item in inboundList">{{item}}</h2>-->
     <!--<el-button class="add" size="small" @click="turnToMobileInbound"><i class="el-icon-plus"></i> 转到入库界面</el-button>-->
     <div class="search">
       <el-form :inline="true" :model="searchForm">
@@ -128,11 +129,12 @@
         prop="dept.name"
         label="部门">
       </el-table-column>
-      <!--TODO 审核按钮，以及编辑操作的detial（考虑将审核操作放在编辑里，有审核权限的人可以操作审核）-->
-      <el-table-column label="操作">
+      <el-table-column label="审核">
         <template scope="scope">
-          <el-button :plain="true" type="info" icon="edit" size="small"
-                     @click="editInboundList(scope.row)"></el-button>
+          <el-button :plain="true" type="success" size="small" v-if="scope.row.status==='UNAUDITED'"
+                     @click="passInboundList(scope.row)"><i class="el-icon-check"></i></el-button>
+          <el-button :plain="true" type="danger" size="small" v-if="scope.row.status==='UNAUDITED'"
+                     @click="refuseInboundList(scope.row)"><i class="el-icon-close"></i></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -324,8 +326,63 @@
           }
         })
       },
-      editInboundList(row) {
-        this.$router.push(`/model_list/${row.id}`)
+      passInboundList(row) {
+        let self = this
+        let passUrl = `${backEndUrl}/mobile_inbound/pass_mobile_inbound.do`
+        this.$confirm('确认审核通过？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'success'
+        }).then(() => {
+          axios.get(passUrl, {
+            params: {
+              id: row.id
+            }
+          }).then((response) => {
+            if (response.data.status === SUCCESS) {
+              self.getInboundLists()
+              self.$message({
+                type: 'success',
+                message: '审核成功!'
+              })
+            } else {
+              self.$message({
+                type: 'error',
+                message: response.data.msg
+              })
+            }
+          })
+        }).catch(() => {
+        })
+      },
+      refuseInboundList(row) {
+        let self = this
+        let refuseUrl = `${backEndUrl}/mobile_inbound/refuse_mobile_inbound.do`
+        this.$confirm('确认拒绝该入库单？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'danger'
+        }).then(() => {
+          axios.get(refuseUrl, {
+            params: {
+              id: row.id
+            }
+          }).then((response) => {
+            if (response.data.status === SUCCESS) {
+              self.getInboundLists()
+              self.$message({
+                type: 'success',
+                message: '退回成功!'
+              })
+            } else {
+              self.$message({
+                type: 'error',
+                message: response.data.msg
+              })
+            }
+          })
+        }).catch(() => {
+        })
       },
       tableRowClassName(row) {
         if (row.status === 'UNAUDITED') {
