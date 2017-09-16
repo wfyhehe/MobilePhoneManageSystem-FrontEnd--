@@ -196,7 +196,7 @@ const UserInfo = (resolve) => {
 Vue.use(Router);
 
 export default new Router({
-  mode: 'history',
+  mode: 'hash',
   routes: [{
     path: '/sign_in',
     component: SignIn
