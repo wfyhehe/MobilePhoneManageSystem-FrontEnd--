@@ -111,9 +111,13 @@
             sortOrder = topMenu.sortOrder + 1
           }
         }
-        axios.post(addMenuUrl, {
+        axios.post(addMenuUrl, JSON.stringify({
           name: '新建菜单项',
           sortOrder
+        }), {
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8'
+          }
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             this.getMenus()
@@ -163,10 +167,14 @@
             sortOrder = child.sortOrder + 1
           }
         }
-        axios.post(addMenuUrl, {
+        axios.post(addMenuUrl, JSON.stringify({
           parentId: row.id,
           name: '新建菜单项',
           sortOrder
+        }), {
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8'
+          }
         }).then((response) => {
           if (response.data.status === SUCCESS) {
             this.getMenus()

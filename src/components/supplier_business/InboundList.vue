@@ -278,10 +278,10 @@
       getSuppliers(type) {
         let self = this
         let supplierUrl = `${backEndUrl}/supplier/get_suppliers.do`
-        axios.post(supplierUrl, {
+        axios.post(supplierUrl, JSON.stringify({
           name: '',
           type: type
-        }, {
+        }), {
           headers: {
             'Content-Type': 'application/json;charset=UTF-8'
           }
@@ -311,10 +311,10 @@
       getMobileModels(brand) {
         let self = this
         let mobileModelUrl = `${backEndUrl}/mobile_model/get_mobile_models.do`
-        axios.post(mobileModelUrl, {
+        axios.post(mobileModelUrl, JSON.stringify({
           name: '',
           brand: brand ? brand.name : ''
-        }, {
+        }), {
           headers: {
             'Content-Type': 'application/json;charset=UTF-8'
           }

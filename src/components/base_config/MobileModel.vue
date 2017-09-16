@@ -52,7 +52,7 @@
           <template scope="scope">
             <el-popover trigger="hover" placement="top">
               <el-table
-                :fit="false"
+                :fit="true"
                 :data="scope.row.rebatePrices">
                 <el-table-column
                   width="150"
@@ -139,7 +139,7 @@
           <template scope="scope">
             <el-popover trigger="hover" placement="top">
               <el-table
-                :fit="false"
+                :fit="true"
                 :data="scope.row.rebatePrices">
                 <el-table-column
                   width="150"
@@ -569,6 +569,15 @@
 
   .inline-table .el-table {
     margin-top: 20px;
+  }
+
+  .the-table {
+    float: left;
+    width: 200px;
+  }
+
+  .the-table  *{
+    float: left;
   }
 
   .recover {

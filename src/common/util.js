@@ -1,3 +1,6 @@
+import {getToken} from '@/common/cache'
+import {TokenUtil} from "./cache";
+
 export function debounce(func, delay) {
   let timer
   return function (...args) {
@@ -22,4 +25,11 @@ export function formatMoney(s, n) {
   return t.split("").reverse().join("") + "." + r;
 }
 
-
+export function isSuperAdmin() {
+  let token = getToken()
+  if (!token) {
+    return false
+  }
+  let uuid = TokenUtil.parseUuid(token)
+  return uuid.charAt(uuid.length - 1) === '-'
+}

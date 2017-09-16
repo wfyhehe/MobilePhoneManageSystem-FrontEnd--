@@ -187,10 +187,16 @@ const InboundList = (resolve) => {
   })
 }
 
+const UserInfo = (resolve) => {
+  import('@/components/system_manage/UserInfo').then((module) => {
+    resolve(module)
+  })
+}
+
 Vue.use(Router);
 
 export default new Router({
-  mode: "history",
+  mode: 'history',
   routes: [{
     path: '/sign_in',
     component: SignIn
@@ -296,5 +302,8 @@ export default new Router({
   }, {
     path: '/inbound_list',
     component: InboundList
+  }, {
+    path: '/user_info',
+    component: UserInfo
   }]
 })

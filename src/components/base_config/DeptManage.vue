@@ -122,10 +122,10 @@
       addDept() {
         let self = this
         let addDeptUrl = `${backEndUrl}/dept/add_dept.do`
-        axios.post(addDeptUrl, {
+        axios.post(addDeptUrl, JSON.stringify({
           name: '新建部门',
           address: '比基尼海滩裤头村菠萝屋'
-        }, {
+        }), {
           headers: {
             'Content-Type': 'application/json; charset=UTF-8'
           }

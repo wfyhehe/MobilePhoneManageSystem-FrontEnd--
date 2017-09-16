@@ -126,13 +126,13 @@
       signUp() {
         let signUpUrl = `${backEndUrl}/auth/sign_up.do`
         let self = this
-        axios.post(signUpUrl, {
+        axios.post(signUpUrl, JSON.stringify({
           user: {
             username: self.registerForm.username,
             password: self.registerForm.password
           },
           vCode: self.registerForm.verificationCode
-        }, {
+        }), {
           headers: {
             'Content-Type': 'application/json;charset=UTF-8'
           },

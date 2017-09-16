@@ -1,7 +1,7 @@
 import {getToken, setToken} from '@/common/cache'
 import axios from 'axios'
 
-export const backEndUrl = "http://localhost:8080/ManageSystem"
+export const backEndUrl = "http://localhost:8080"
 export const SUCCESS = 0
 
 /**

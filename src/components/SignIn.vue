@@ -23,6 +23,20 @@
           </span>
         </el-form-item>
       </el-form>
+      <div class="notes">
+        <el-button class="add" size="small" v-if="isSuperAdmin" @click="addInfo">
+          <i class="el-icon-plus"></i>添加信息
+        </el-button>
+        <ul>
+          <div class="li" v-for="info in infos" :key="info.id">
+            <li>{{info.content}}</li>
+            <el-button :plain="true" type="info" icon="edit" size="small" class="delete"
+                       v-if="isSuperAdmin" @click="editInfo(info)"></el-button>
+            <el-button :plain="true" type="danger" icon="delete" size="small" class="delete"
+                       v-if="isSuperAdmin" @click="deleteInfo(info.id)"></el-button>
+          </div>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
@@ -33,8 +47,11 @@
   import {setToken, TokenUtil, setLoginUser} from '@/common/cache'
   import CookieUtil from '@/common/cookie'
   import {mapMutations, mapGetters} from 'vuex'
+  import {isSuperAdmin} from '@/common/util'
+  import ElButton from "../../node_modules/element-ui/packages/button/src/button.vue";
 
   export default {
+    components: {ElButton},
     data() {
       let validateVerificationCode = (rule, value, callback) => {
         if (!value) {
@@ -71,6 +88,7 @@
           password: '',
           verificationCode: ''
         },
+        infos: [],
         loginRule: {
           username: [
             {validator: validateUsername, trigger: 'blur'}
@@ -86,6 +104,9 @@
       }
     },
     computed: {
+      isSuperAdmin() {
+        return isSuperAdmin()
+      },
       ...mapGetters([
         'signInInfo'
       ])
@@ -112,11 +133,11 @@
       signIn() {
         let loginUrl = `${backEndUrl}/auth/sign_in.do`
         let self = this
-        axios.post(loginUrl, { // 验证用户名密码
+        axios.post(loginUrl, JSON.stringify({ // 验证用户名密码
           username: self.loginForm.username,
           password: self.loginForm.password,
           vCode: self.loginForm.verificationCode
-        }, {
+        }), {
           headers: {
             'Content-Type': 'application/json;charset=UTF-8'
           },
@@ -150,6 +171,102 @@
           }
         })
       },
+      getInfos() {
+        let infoUrl = `${backEndUrl}/info/get_infos.do`
+        let self = this
+        axios.get(infoUrl, {
+          params: {
+            position: "SIGN_IN"
+          }
+        }).then((response) => {
+          if (response.data.status === SUCCESS) {
+            this.infos = response.data.data
+          } else {
+            self.$message.error(response.data.msg)
+          }
+        })
+      },
+      editInfo(info) {
+        let self = this
+        let updateUrl = `${backEndUrl}/info/update_info.do`
+        this.$prompt('请输入信息', '提示', {
+          inputValue: info.content,
+          confirmButtonText: '确定',
+          cancelButtonText: '取消'
+        }).then(({value}) => {
+          axios.post(updateUrl, JSON.stringify({
+            id: info.id,
+            content: value,
+            position: 'SIGN_IN'
+          }), {
+            headers: {
+              'Content-Type': 'application/json;charset=UTF-8'
+            }
+          }).then((response) => {
+            if (response.data.status === SUCCESS) {
+              self.getInfos()
+              self.$message.success('修改成功')
+            } else {
+              self.$message.error(response.data.msg)
+            }
+          })
+        }).catch(() => {
+        })
+      },
+      addInfo() {
+        let self = this
+        let addUrl = `${backEndUrl}/info/add_info.do`
+        this.$prompt('请输入信息', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消'
+        }).then(({value}) => {
+          axios.post(addUrl, JSON.stringify({ // 验证用户名密码
+            content: value,
+            position: 'SIGN_IN'
+          }), {
+            headers: {
+              'Content-Type': 'application/json;charset=UTF-8'
+            }
+          }).then((response) => {
+            if (response.data.status === SUCCESS) {
+              self.getInfos()
+              self.$message.success('添加成功')
+            } else {
+              self.$message.error(response.data.msg)
+            }
+          })
+        }).catch(() => {
+        })
+      },
+      deleteInfo(id) {
+        let self = this
+        let deleteUrl = `${backEndUrl}/info/delete_info.do`
+        this.$confirm('此操作将删除词条信息, 是否继续？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'danger'
+        }).then(() => {
+          axios.get(deleteUrl, {
+            params: {
+              id
+            }
+          }).then((response) => {
+            if (response.data.status === SUCCESS) {
+              self.getInfos()
+              self.$message({
+                type: 'success',
+                message: '删除成功!'
+              })
+            } else {
+              self.$message({
+                type: 'error',
+                message: response.data.msg
+              })
+            }
+          })
+        }).catch(() => {
+        })
+      },
       signUp() {
         this.$router.push('/sign_up')
       },
@@ -158,6 +275,7 @@
       })
     },
     mounted() {
+      this.getInfos()
       if (this.signInInfo && this.signInInfo.username && this.signInInfo.password) {
         this.loginForm.username = this.signInInfo.username
         this.loginForm.password = this.signInInfo.password
@@ -192,4 +310,17 @@
     margin: 40px;
   }
 
+  .notes {
+    font-size: 17px;
+    color: #99A9BF;
+  }
+
+  .li {
+    margin: 15px 0;
+  }
+
+  .li .delete{
+    margin-top: 10px;
+    float: top
+  }
 </style>

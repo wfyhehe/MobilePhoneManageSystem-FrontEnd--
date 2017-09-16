@@ -8,20 +8,24 @@
       <el-form-item label="员工姓名">
         <el-input v-model="form.empName" :readonly="true"></el-input>
         <el-button class="relate-emp" v-if="!form.employee"
-        @click="relateEmp">关联员工账号</el-button>
+                   @click="relateEmp">关联员工账号
+        </el-button>
       </el-form-item>
       <el-form-item label="备注">
         <el-input type="textarea" v-model="form.remark"></el-input>
       </el-form-item>
-      <el-form-item label="角色">
-        <el-checkbox-group v-model="form.roleNames">
-          <el-checkbox v-for="role in allRoles"
-                       :key="role.id"
-                       :label="role.name"
-                       :disabled="isSuperAdmin(role)">
-            {{role.name}}
-          </el-checkbox>
-        </el-checkbox-group>
+      <el-form-item label="授权">
+        <el-select v-model="form.roles"
+                   multiple
+                   value-key="id"
+                   placeholder="请选择角色">
+          <el-option
+            v-for="role in allRoles"
+            :key="role.id"
+            :label="role.name"
+            :value="role">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">确定</el-button>
@@ -45,33 +49,33 @@
           username: '',
           empName: '',
           remark: '',
-          roleNames: []
+          roles: []
         },
         allRoles: [],
         user: {}
       }
     },
     methods: {
-      formatData(data) {
-        let dataCopy = JSON.parse(JSON.stringify(data))
-        let newData = {}
-        newData.username = dataCopy.username
-        newData.empName = dataCopy.employee ? dataCopy.employee.name : ''
-        newData.remark = dataCopy.remark
-        let names = []
-        for (let role of dataCopy.roles) {
-          names.push(role.name)
-        }
-        newData.roleNames = names
-        return newData
-      },
+//      formatData(data) {
+//        let dataCopy = JSON.parse(JSON.stringify(data))
+//        let newData = {}
+//        newData.username = dataCopy.username
+//        newData.empName = dataCopy.employee ? dataCopy.employee.name : ''
+//        newData.remark = dataCopy.remark
+//        let names = []
+//        for (let role of dataCopy.roles) {
+//          names.push(role.name)
+//        }
+//        newData.roleNames = names
+//        return newData
+//      },
       onSubmit() {
         let self = this
         let updateUserUrl = `${backEndUrl}/user/update_user.do`
         axios.post(updateUserUrl, JSON.stringify({
           id: self.$route.params.id,
           remark: self.form.remark,
-          roleNames: self.form.roleNames
+          roles: self.form.roles
         }), {
           headers: {
             'Content-Type': 'application/json;charset=UTF-8'
@@ -110,7 +114,10 @@
       }).then(response => {
         if (response.data.status === SUCCESS) {
           self.user = response.data.data
-          self.form = self.formatData(self.user)
+          self.form.username = self.user.username
+          self.form.empName = self.user.employee ? self.user.employee.name : ''
+          self.form.remark = self.user.remark
+          self.form.roles = self.user.roles
         } else {
           self.$message.error(response.data.msg)
         }
