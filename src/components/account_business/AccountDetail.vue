@@ -87,7 +87,7 @@
         })
       },
       selectShowed(flag) {
-        if (flag && this.depts.length === 0) {
+        if (flag) {
           this.getDepts()
         }
       }

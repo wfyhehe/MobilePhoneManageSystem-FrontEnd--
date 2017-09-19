@@ -530,7 +530,7 @@
         })
       },
       selectShowed(flag) {
-        if (flag && (this.brands.length === 0 || this.rebateTypes.length === 0)) {
+        if (flag) {
           this.getBrands()
           this.getRebateTypes()
         }

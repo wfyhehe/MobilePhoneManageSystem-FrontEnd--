@@ -409,7 +409,7 @@
         })
       },
       getOptions(flag) {
-        if (flag && (this.brands.length === 0 || this.supplierTypes.length === 0)) {
+        if (flag) {
           this.getBrands()
           this.getSupplierTypes()
         }

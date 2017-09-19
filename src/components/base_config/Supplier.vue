@@ -402,7 +402,7 @@
         })
       },
       selectShowed(flag) {
-        if (flag && this.types.length === 0) {
+        if (flag) {
           this.getTypes()
         }
       },

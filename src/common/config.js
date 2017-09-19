@@ -1,8 +1,8 @@
 import {getToken, setToken} from '@/common/cache'
 import axios from 'axios'
 
-export const backEndUrl = "http://localhost:8080"
-// export const backEndUrl = "" // TODO 发布后
+// export const backEndUrl = "http://localhost:8080"
+export const backEndUrl = "" // TODO 发布后
 export const SUCCESS = 0
 
 /**
