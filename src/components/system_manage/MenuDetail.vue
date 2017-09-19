@@ -2,7 +2,7 @@
   <div class="menu-detail">
     <el-form ref="form" :model="form" class="form" label-width="80px">
       <h3>修改菜单项</h3>
-      <el-button @click="test">test</el-button>
+      <!--<el-button @click="test">test</el-button>-->
       <el-form-item label="菜单名称">
         <el-input v-model="form.name"></el-input>
       </el-form-item>

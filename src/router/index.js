@@ -2,25 +2,25 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 const SignIn = (resolve) => {
-  import('@/components/SignIn').then((module) => {
+  import('@/components/other/SignIn').then((module) => {
     resolve(module)
   })
 }
 
 const Home = (resolve) => {
-  import('@/components/Home').then((module) => {
+  import('@/components/other/Home').then((module) => {
     resolve(module)
   })
 }
 
 const SignUp = (resolve) => {
-  import('@/components/SignUp').then((module) => {
+  import('@/components/other/SignUp').then((module) => {
     resolve(module)
   })
 }
 
 const Page404 = (resolve) => {
-  import('@/components/Page404').then((module) => {
+  import('@/components/other/Page404').then((module) => {
     resolve(module)
   })
 }
@@ -188,7 +188,13 @@ const InboundList = (resolve) => {
 }
 
 const UserInfo = (resolve) => {
-  import('@/components/system_manage/UserInfo').then((module) => {
+  import('@/components/other/UserInfo').then((module) => {
+    resolve(module)
+  })
+}
+
+const Comment = (resolve) => {
+  import('@/components/other/Comment').then((module) => {
     resolve(module)
   })
 }
@@ -305,5 +311,8 @@ export default new Router({
   }, {
     path: '/user_info',
     component: UserInfo
+  }, {
+    path: '/comment',
+    component: Comment
   }]
 })

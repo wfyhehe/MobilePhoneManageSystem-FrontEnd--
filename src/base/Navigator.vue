@@ -2,8 +2,6 @@
   <div class="navigator">
     <el-menu default-active="2"
              class="navigator-menu"
-             @open="handleOpen"
-             @close="handleClose"
              :router="true"
              theme="dark">
       <router-link tag="p" to="/" class="title">手机进销存管理系统</router-link>

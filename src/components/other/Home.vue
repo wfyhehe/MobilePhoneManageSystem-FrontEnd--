@@ -5,6 +5,7 @@
       <el-button class="add" size="small" v-if="isSuperAdmin" @click="addInfo">
         <i class="el-icon-plus"></i>添加信息
       </el-button>
+      <router-link to="/comment" class="comment-me">给我留言</router-link>
       <ul>
         <div class="li" v-for="info in infos" :key="info.id">
           <li>{{info.content}}</li>
@@ -160,6 +161,11 @@
     font-size: 12px;
     float: right;
     margin-right: 10px;
+  }
+
+  .comment-me {
+    font-size: 22px;
+    margin: 10px;
   }
 
   h1, h2 {
