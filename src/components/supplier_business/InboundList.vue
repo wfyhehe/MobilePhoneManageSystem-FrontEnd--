@@ -313,7 +313,7 @@
         let mobileModelUrl = `${backEndUrl}/mobile_model/get_mobile_models.do`
         axios.post(mobileModelUrl, JSON.stringify({
           name: '',
-          brand: brand ? brand.name : ''
+          brand
         }), {
           headers: {
             'Content-Type': 'application/json;charset=UTF-8'

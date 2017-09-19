@@ -4,7 +4,7 @@
       <h2>留言({{count}}条)</h2>
       <li v-for="item in comments" :key="item.id" :class="listClass(item)">
         <div class="item">
-          <span class="user">{{item.user.username}}&nbsp;说：</span>
+          <span class="user">{{item.user ? item.user.username : item.ip}}&nbsp;说：</span>
           <span class="control" v-if="isSuperAdmin">
             <el-button :plain="true" type="danger" icon="delete" size="small" class="delete"
                        v-if="isSuperAdmin" @click="deleteComment(item.id)"></el-button>
